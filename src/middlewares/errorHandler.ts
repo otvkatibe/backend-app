@@ -1,6 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../utils/AppError';
+import { Prisma } from '@prisma/client';
 import { ZodError } from 'zod';
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import { AppError } from '../utils/AppError';
+import {
+    handlePrismaError,
+    handleZodError,
+    handleJWTError,
+    handleAppError,
+    handleGenericError,
+    handleSyntaxError,
+    isPrismaError
+} from './errorMappers';
 
 export const errorHandler = (
     err: Error,
@@ -8,25 +19,32 @@ export const errorHandler = (
     res: Response,
     next: NextFunction
 ) => {
+    // 1. Business Logic Errors (Explicitly thrown by us)
     if (err instanceof AppError) {
-        return res.status(err.statusCode).json({
-            status: 'error',
-            message: err.message,
-        });
+        return handleAppError(err, res);
     }
 
+    // 2. Input Validation Errors (Zod)
     if (err instanceof ZodError) {
-        return res.status(400).json({
-            status: 'error',
-            message: 'Validation error',
-            errors: err.issues,
-        });
+        return handleZodError(err, res);
     }
 
-    console.error(err);
+    // 3. Database Errors (Prisma)
+    if (isPrismaError(err)) {
+        return handlePrismaError(err, res);
+    }
 
-    return res.status(500).json({
-        status: 'error',
-        message: 'Internal server error',
-    });
+    // 4. Authentication Errors (JWT)
+    if (err instanceof JsonWebTokenError || err instanceof TokenExpiredError) {
+        return handleJWTError(err, res);
+    }
+
+    // 5. Malformed JSON (Express/BodyParser)
+    // Note: 'status' property exists on some Express/BodyParser syntax errors
+    if (err instanceof SyntaxError && 'status' in err && (err as any).status === 400 && 'body' in err) {
+        return handleSyntaxError(err, res);
+    }
+
+    // 6. Unknown/Unhandled Errors
+    return handleGenericError(err, res);
 };
