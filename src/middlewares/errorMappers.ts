@@ -88,9 +88,11 @@ export const handleSyntaxError = (err: SyntaxError, res: Response) => {
 }
 
 export const handleGenericError = (err: Error, res: Response) => {
-    console.error('🔥 CRITICAL ERROR:', err); // Log full stacktrace for debugging
+    // Note: We don't need to log here anymore because the main errorHandler already logged it.
+    // Or we can log specific details if needed.
+
     return res.status(500).json({
         status: 'error',
-        message: 'Internal server error.',
+        message: 'Internal server error',
     });
 };

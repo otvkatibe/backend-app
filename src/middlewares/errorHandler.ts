@@ -12,6 +12,7 @@ import {
     handleSyntaxError,
     isPrismaError
 } from './errorMappers';
+import { logger } from '../utils/logger';
 
 export const errorHandler = (
     err: Error,
@@ -19,6 +20,12 @@ export const errorHandler = (
     res: Response,
     next: NextFunction
 ) => {
+    // Log exception (Traceability)
+    logger.error('Unhandled Exception escaped to ErrorHandler', {
+        error: err.message,
+        stack: err.stack,
+        requestId: (req as any).id // Assuming req.id might not be directly on Request type
+    });
     // 1. Business Logic Errors (Explicitly thrown by us)
     if (err instanceof AppError) {
         return handleAppError(err, res);

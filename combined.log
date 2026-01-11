@@ -1,0 +1,2 @@
+{"duration":"8ms","ip":"::1","level":"info","message":"Request completed","method":"GET","requestId":"89379be1-6800-43f5-b6ed-2ff2324d58f3","status":200,"timestamp":"2026-01-11T21:05:10.539Z","url":"/status"}
+{"duration":"1ms","ip":"::1","level":"warn","message":"Request failed","method":"GET","requestId":"c2c952dd-faab-4bce-a369-57b7051c6afd","status":404,"timestamp":"2026-01-11T21:05:10.544Z","url":"/not-found"}
