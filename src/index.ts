@@ -1,4 +1,7 @@
 import express, { type Request, type Response } from 'express';
+// Move HealthController import to top
+import { HealthController } from './controllers/health.controller';
+import { gracefulShutdown } from './utils/shutdown';
 
 import userRoute from './routes/user.route';
 import { errorHandler } from './middlewares/errorHandler';
@@ -15,19 +18,17 @@ app.use(requestId);
 app.use(requestLogger);
 app.use(globalLimiter);
 
-// Health Check Route (Deep Check)
-import { HealthController } from './controllers/health.controller';
+// Instantiate HealthController
 const healthController = new HealthController();
-app.get('/health', healthController.check);
+// Bind context to prevent 'this' loss
+app.get('/health', healthController.check.bind(healthController));
 
 app.use(userRoute);
 
 app.use(errorHandler);
 
-import { gracefullShutdown } from './utils/shutdown';
-
 const server = app.listen(3000, () => {
     logger.info('App running on port 3000');
 });
 
-gracefullShutdown(server);
+gracefulShutdown(server);
