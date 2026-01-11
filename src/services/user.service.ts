@@ -46,22 +46,15 @@ export class UserService {
             throw new AppError('Invalid email or password', 401);
         }
 
-        const passwordMatch = await bcrypt.compare(data.password, user.password);
+        const validPassword = await bcrypt.compare(data.password, user.password);
 
-        if (!passwordMatch) {
+        if (!validPassword) {
             throw new AppError('Invalid email or password', 401);
         }
 
-        const token = sign({ id: user.id });
+        const token = sign({ id: user.id, role: user.role });
 
-        return {
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-            },
-            token,
-        };
+        return { user, token };
     }
 
     async getProfile(userId: string) {

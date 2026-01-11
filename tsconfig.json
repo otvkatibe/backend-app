@@ -13,11 +13,17 @@
     "verbatimModuleSyntax": false,
     "outDir": "dist",
     "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     /* File Layout */
     "rootDir": "src"
   },
+  "ts-node": {
+    "files": true
+  },
   "include": [
-    "src"
+    "src/**/*",
+    "src/types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules"

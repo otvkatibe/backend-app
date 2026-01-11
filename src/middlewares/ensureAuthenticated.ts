@@ -16,9 +16,12 @@ export const ensureAuthenticated = (
     const [, token] = authHeader.split(' ');
 
     try {
-        const decoded = verify(token);
-        // Adiciona o userId ao objeto request (requer Type Definition ou uso de as any)
-        (req as any).userId = decoded.id;
+        const { id, role } = verify(token);
+
+        req.user = {
+            id,
+            role
+        };
 
         return next();
     } catch (err) {
