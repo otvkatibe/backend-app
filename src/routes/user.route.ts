@@ -55,6 +55,8 @@ userRoute.post('/users', authLimiter, userController.create);
  *         description: Invalid credentials
  */
 userRoute.post('/login', authLimiter, userController.login);
+userRoute.get('/users', ensureAuthenticated, authorize(['ADMIN']), userController.listAll);
+
 userRoute.get('/admin/stats', ensureAuthenticated, authorize(['ADMIN']), (req, res) => {
     return res.json({ status: 'open' });
 });

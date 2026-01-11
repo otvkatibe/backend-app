@@ -4,6 +4,8 @@ import { AppError } from '../utils/AppError';
 import { sign } from '../utils/jwt';
 import { z } from 'zod';
 import { createUserSchema, loginSchema } from '../schemas/user.schema';
+import { calculatePagination } from '../utils/prismaHelper';
+import { PaginationOptions, PaginatedResult } from '../types/PaginationTypes';
 
 type CreateUserDTO = z.infer<typeof createUserSchema>;
 type LoginDTO = z.infer<typeof loginSchema>;
@@ -74,5 +76,42 @@ export class UserService {
         }
 
         return user;
+    }
+
+    async listAll(options: PaginationOptions) {
+        const { skip, take, page, limit } = calculatePagination(options);
+
+        // Transaction to ensure consistency between data and count
+        const [users, total] = await prisma.$transaction([
+            prisma.user.findMany({
+                skip,
+                take,
+                orderBy: {
+                    name: options.order === 'desc' ? 'desc' : 'asc'
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                    createdAt: true
+                }
+            }),
+            prisma.user.count()
+        ]);
+
+        const totalPages = Math.ceil(total / limit);
+
+        const result: PaginatedResult<typeof users[0]> = {
+            data: users,
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages
+            }
+        };
+
+        return result;
     }
 }
