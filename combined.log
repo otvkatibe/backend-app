@@ -7,3 +7,6 @@
 {"level":"info","message":"SIGINT signal received: closing HTTP server","timestamp":"2026-01-11T21:19:18.373Z"}
 {"level":"info","message":"HTTP server closed","timestamp":"2026-01-11T21:19:18.375Z"}
 {"level":"info","message":"Database connection closed","timestamp":"2026-01-11T21:19:18.385Z"}
+{"level":"info","message":"App running on port 3000","timestamp":"2026-01-11T21:26:20.825Z"}
+{"level":"info","message":"Swagger Docs available at http://localhost:3000/api-docs","timestamp":"2026-01-11T21:26:20.828Z"}
+{"duration":"8ms","ip":"::1","level":"info","message":"Request completed","method":"GET","requestId":"a61a141f-c9e6-48b3-aad7-1b0eb1679071","status":200,"timestamp":"2026-01-11T21:26:26.010Z","url":"/"}

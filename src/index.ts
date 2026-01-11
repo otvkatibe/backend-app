@@ -27,8 +27,14 @@ app.use(userRoute);
 
 app.use(errorHandler);
 
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger';
+
 const server = app.listen(3000, () => {
     logger.info('App running on port 3000');
+    logger.info('Swagger Docs available at http://localhost:3000/api-docs');
 });
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 gracefulShutdown(server);
