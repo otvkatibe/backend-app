@@ -8,14 +8,9 @@
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-    /* Strictness */
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "forceConsistentCasingInFileNames": true,
-    /* Transpiling with Bundlers (not used here but good practice to align) */
-    "moduleResolution": "NodeNext",
-    "module": "NodeNext",
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "verbatimModuleSyntax": false,
     "outDir": "dist",
     "sourceMap": true,
     /* File Layout */
