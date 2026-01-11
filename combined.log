@@ -2,3 +2,8 @@
 {"duration":"1ms","ip":"::1","level":"warn","message":"Request failed","method":"GET","requestId":"c2c952dd-faab-4bce-a369-57b7051c6afd","status":404,"timestamp":"2026-01-11T21:05:10.544Z","url":"/not-found"}
 {"level":"info","message":"App running on port 3000","timestamp":"2026-01-11T21:13:53.335Z"}
 {"duration":"1422ms","ip":"::1","level":"info","message":"Request completed","method":"GET","requestId":"567280c2-ce6a-4877-905a-c20973b80bcb","status":200,"timestamp":"2026-01-11T21:14:02.454Z","url":"/health"}
+{"level":"info","message":"App running on port 3000","timestamp":"2026-01-11T21:18:03.401Z"}
+{"duration":"1237ms","ip":"::1","level":"info","message":"Request completed","method":"GET","requestId":"6834c232-7aa6-4a39-baa0-262ceaa88843","status":200,"timestamp":"2026-01-11T21:18:10.215Z","url":"/health"}
+{"level":"info","message":"SIGINT signal received: closing HTTP server","timestamp":"2026-01-11T21:19:18.373Z"}
+{"level":"info","message":"HTTP server closed","timestamp":"2026-01-11T21:19:18.375Z"}
+{"level":"info","message":"Database connection closed","timestamp":"2026-01-11T21:19:18.385Z"}
