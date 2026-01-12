@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import { cacheService } from './cache.service';
 import { prisma } from '../utils/prisma';
 import { AppError } from '../utils/AppError';
 import { sign } from '../utils/jwt';
@@ -27,6 +28,7 @@ export class UserService {
                 name: data.name,
                 email: data.email,
                 password: hashedPassword,
+                role: 'USER' // Default role
             },
             select: {
                 id: true,
@@ -35,6 +37,9 @@ export class UserService {
                 createdAt: true,
             },
         });
+
+        // Invalidate list cache
+        await cacheService.del('users:list:*');
 
         return user;
     }
@@ -79,6 +84,13 @@ export class UserService {
     }
 
     async listAll(options: PaginationOptions) {
+        const cacheKey = `users:list:${JSON.stringify(options)}`;
+        const cached = await cacheService.get<any>(cacheKey);
+
+        if (cached) {
+            return cached;
+        }
+
         const { skip, take, page, limit } = calculatePagination(options);
 
         // Transaction to ensure consistency between data and count
@@ -111,6 +123,9 @@ export class UserService {
                 totalPages
             }
         };
+
+        // Set cache for 60 seconds
+        await cacheService.set(cacheKey, result, 60);
 
         return result;
     }
