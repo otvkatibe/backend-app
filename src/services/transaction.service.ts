@@ -10,16 +10,19 @@ export class TransactionService {
 
         // 1. Verify Wallet Ownership
         const wallet = await prisma.wallet.findUnique({ where: { id: walletId } });
-        if (!wallet) throw new AppError('Wallet not found', 404);
-        if (wallet.userId !== userId) throw new AppError('Unauthorized access to this wallet', 403);
+        if (!wallet) throw new AppError('Carteira nao encontrada', 404);
+        if (wallet.userId !== userId) throw new AppError('Acesso nao autorizado a esta carteira', 403);
 
         // 2. Verify Category Ownership
         const category = await prisma.category.findUnique({ where: { id: categoryId } });
-        if (!category) throw new AppError('Category not found', 404);
-        if (category.userId !== userId) throw new AppError('Unauthorized access to this category', 403);
+        if (!category) throw new AppError('Categoria nao encontrada', 404);
+        if (category.userId !== userId) throw new AppError('Acesso nao autorizado a esta categoria', 403);
 
         // 3. Execute Transaction Atomically (Create Transaction + Update Wallet Balance)
-        const result = await prisma.$transaction(async (tx) => {
+        // Extracting type directly from the transaction method to ensure compatibility
+        type TxClient = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
+
+        const result = await prisma.$transaction(async (tx: any) => {
             const transaction = await tx.transaction.create({
                 data: {
                     amount,
