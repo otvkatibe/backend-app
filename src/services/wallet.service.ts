@@ -38,11 +38,11 @@ export class WalletService {
         });
 
         if (!wallet) {
-            throw new AppError('Wallet not found', 404);
+            throw new AppError('Carteira nao encontrada', 404);
         }
 
         if (wallet.userId !== userId) {
-            throw new AppError('Unauthorized access to this wallet', 403);
+            throw new AppError('Acesso nao autorizado a esta carteira', 403);
         }
 
         return wallet;

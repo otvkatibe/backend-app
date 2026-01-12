@@ -27,11 +27,11 @@ export class CategoryService {
         });
 
         if (!category) {
-            throw new AppError('Category not found', 404);
+            throw new AppError('Categoria nao encontrada', 404);
         }
 
         if (category.userId !== userId) {
-            throw new AppError('Unauthorized access to this category', 403);
+            throw new AppError('Acesso nao autorizado a esta categoria', 403);
         }
 
         return category;

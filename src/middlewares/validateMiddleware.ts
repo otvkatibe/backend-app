@@ -14,7 +14,7 @@ export const validate = (schema: ZodSchema) => async (req: Request, res: Respons
         if (error instanceof ZodError) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const errorMessage = (error as any).errors.map((e: any) => e.message).join(', ');
-            return next(new AppError(`Validation failed: ${errorMessage}`, 400));
+            return next(new AppError(`Falha na validacao: ${errorMessage}`, 400));
         }
         return next(error);
     }

@@ -12,6 +12,7 @@ class CacheService {
             password: process.env.REDIS_PASSWORD || undefined,
             maxRetriesPerRequest: 1,
             enableOfflineQueue: false,
+            lazyConnect: true,
         });
 
         this.redis.on('connect', () => {
@@ -36,6 +37,7 @@ class CacheService {
      */
     async get<T>(key: string): Promise<T | null> {
         try {
+            if (this.redis.status !== 'ready') return null;
             const data = await this.redis.get(key);
             if (!data) return null;
             return JSON.parse(data) as T;
@@ -53,6 +55,7 @@ class CacheService {
      */
     async set(key: string, value: any, ttl: number = 60): Promise<void> {
         try {
+            if (this.redis.status !== 'ready') return;
             await this.redis.set(key, JSON.stringify(value), 'EX', ttl);
         } catch (error) {
             logger.error(`Cache SET error for key ${key}:`, error);
@@ -65,6 +68,7 @@ class CacheService {
      */
     async del(key: string): Promise<void> {
         try {
+            if (this.redis.status !== 'ready') return;
             await this.redis.del(key);
         } catch (error) {
             logger.error(`Cache DEL error for key ${key}:`, error);
@@ -75,7 +79,11 @@ class CacheService {
      * Connect to Redis (creates instance if not exists)
      */
     public async connect(): Promise<void> {
-        // ioredis connects automatically on instantiation
+        try {
+            await this.redis.connect();
+        } catch (error) {
+            logger.error('Failed to connect to Redis', error);
+        }
     }
 
     /**

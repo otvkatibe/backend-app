@@ -18,7 +18,7 @@ export class UserService {
         });
 
         if (userExists) {
-            throw new AppError('User already exists', 409);
+            throw new AppError('Usuario ja existe', 409);
         }
 
         const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -50,13 +50,13 @@ export class UserService {
         });
 
         if (!user) {
-            throw new AppError('Invalid email or password', 401);
+            throw new AppError('Email ou senha invalidos', 401);
         }
 
         const validPassword = await bcrypt.compare(data.password, user.password);
 
         if (!validPassword) {
-            throw new AppError('Invalid email or password', 401);
+            throw new AppError('Email ou senha invalidos', 401);
         }
 
         const token = sign({ id: user.id, role: user.role });
@@ -77,7 +77,7 @@ export class UserService {
         });
 
         if (!user) {
-            throw new AppError('User not found', 404);
+            throw new AppError('Usuario nao encontrado', 404);
         }
 
         return user;

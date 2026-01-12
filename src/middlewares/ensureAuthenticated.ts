@@ -10,7 +10,7 @@ export const ensureAuthenticated = (
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-        throw new AppError('Token missing', 401);
+        throw new AppError('Token ausente', 401);
     }
 
     const [, token] = authHeader.split(' ');
@@ -25,6 +25,6 @@ export const ensureAuthenticated = (
 
         return next();
     } catch (err) {
-        throw new AppError('Invalid token', 401);
+        throw new AppError('Token invalido', 401);
     }
 };

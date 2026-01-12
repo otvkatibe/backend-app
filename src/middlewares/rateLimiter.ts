@@ -7,7 +7,7 @@ export const globalLimiter = rateLimit({
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     message: {
         status: 'error',
-        message: 'Too many requests from this IP, please try again later.'
+        message: 'Muitas requisicoes deste IP, por favor tente novamente mais tarde.'
     }
 });
 
@@ -18,6 +18,6 @@ export const authLimiter = rateLimit({
     legacyHeaders: false,
     message: {
         status: 'error',
-        message: 'Too many login attempts from this IP, please try again after 15 minutes'
+        message: 'Muitas tentativas de login deste IP, por favor tente novamente apos 15 minutos'
     }
 });
