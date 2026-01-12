@@ -1,6 +1,7 @@
 import request from 'supertest';
 import app from '../../src/app';
 import { prisma } from '../../src/utils/prisma';
+import { clearDatabase } from '../setup';
 
 describe('E2E Auth', () => {
 
@@ -13,13 +14,13 @@ describe('E2E Auth', () => {
 
     beforeAll(async () => {
         // Cleanup before tests
-        await prisma.user.deleteMany({ where: { email: testUser.email } });
+        await clearDatabase();
     });
 
     afterAll(async () => {
         // Cleanup after tests
-        await prisma.user.deleteMany({ where: { email: testUser.email } });
-        await prisma.$disconnect();
+        await clearDatabase();
+        // await prisma.$disconnect();
     });
 
     it('should register a new user', async () => {

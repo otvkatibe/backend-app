@@ -1,4 +1,9 @@
+import { prisma } from '../src/utils/prisma';
+
 export const clearDatabase = async () => {
-    // In a real scenario we would clear tables.
-    // For now we mock or assume test runs on a test DB.
+    // Truncate all tables to ensure clean state
+    // Use CASCADE to handle foreign keys
+    await prisma.$executeRawUnsafe(`
+      TRUNCATE TABLE "transactions", "budgets", "goals", "categories", "wallets", "users" RESTART IDENTITY CASCADE;
+    `);
 };

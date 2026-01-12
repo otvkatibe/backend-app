@@ -1,6 +1,7 @@
 import request from 'supertest';
 import app from '../../src/app';
 import { prisma } from '../../src/utils/prisma';
+import { clearDatabase } from '../setup';
 
 describe('E2E RBAC', () => {
 
@@ -21,9 +22,7 @@ describe('E2E RBAC', () => {
 
     beforeAll(async () => {
         // Cleanup potential leftovers
-        await prisma.user.deleteMany({
-            where: { email: { in: [adminUser.email, regularUser.email] } }
-        });
+        await clearDatabase();
 
         // 1. Register Admin User
         await request(app).post('/users').send(adminUser);
@@ -53,10 +52,7 @@ describe('E2E RBAC', () => {
     });
 
     afterAll(async () => {
-        await prisma.user.deleteMany({
-            where: { email: { in: [adminUser.email, regularUser.email] } }
-        });
-        await prisma.$disconnect();
+        await clearDatabase();
     });
 
     describe('GET /users (Admin Route)', () => {

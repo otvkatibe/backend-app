@@ -2,6 +2,7 @@ import request from 'supertest';
 import app from '../../src/app';
 import { prisma } from '../../src/utils/prisma';
 import jwt from 'jsonwebtoken';
+import { clearDatabase } from '../setup';
 
 describe('E2E Pagination', () => {
 
@@ -17,7 +18,7 @@ describe('E2E Pagination', () => {
 
     beforeAll(async () => {
         // Cleanup
-        await prisma.user.deleteMany({}); // Clear all for clean pagination count
+        await clearDatabase();
 
         // 1. Create Admin
         await request(app).post('/users').send(adminUser);
@@ -47,8 +48,7 @@ describe('E2E Pagination', () => {
     });
 
     afterAll(async () => {
-        await prisma.user.deleteMany({});
-        await prisma.$disconnect();
+        await clearDatabase();
     });
 
     it('should return 10 items by default', async () => {

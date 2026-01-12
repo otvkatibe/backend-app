@@ -2,6 +2,7 @@
 import request from 'supertest';
 import app from '../../src/app';
 import { prisma } from '../../src/utils/prisma';
+import { clearDatabase } from '../setup';
 
 describe('Modulo Financeiro Fase 2 E2E', () => {
     let token: string;
@@ -11,12 +12,7 @@ describe('Modulo Financeiro Fase 2 E2E', () => {
 
     beforeAll(async () => {
         // Cleanup
-        await prisma.transaction.deleteMany();
-        await prisma.budget.deleteMany();
-        await prisma.goal.deleteMany();
-        await prisma.category.deleteMany();
-        await prisma.wallet.deleteMany();
-        await prisma.user.deleteMany();
+        await clearDatabase();
 
         // Create User & Login
         const userRes = await request(app).post('/users/register').send({
@@ -41,7 +37,7 @@ describe('Modulo Financeiro Fase 2 E2E', () => {
     });
 
     afterAll(async () => {
-        await prisma.$disconnect();
+        // await prisma.$disconnect(); // Keep connection alive for other tests in band
     });
 
     describe('Orcamentos', () => {
