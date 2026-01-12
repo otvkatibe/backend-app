@@ -16,14 +16,15 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     /* File Layout */
-    "rootDir": "src"
+    // "rootDir": "src" 
   },
   "ts-node": {
     "files": true
   },
   "include": [
     "src/**/*",
-    "src/types/**/*.d.ts"
+    "src/types/**/*.d.ts",
+    "tests/**/*"
   ],
   "exclude": [
     "node_modules"
