@@ -3,6 +3,9 @@ import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger';
 import { HealthController } from './controllers/health.controller';
 import userRoute from './routes/user.route';
+import { walletRoutes } from './routes/wallet.routes';
+import { categoryRoutes } from './routes/category.routes';
+import { transactionRoutes } from './routes/transaction.routes';
 import { errorHandler } from './middlewares/errorHandler';
 import { globalLimiter } from './middlewares/rateLimiter';
 import { requestId } from './middlewares/requestId';
@@ -23,6 +26,9 @@ const healthController = new HealthController();
 app.get('/health', healthController.check.bind(healthController));
 
 app.use(userRoute);
+app.use('/wallets', walletRoutes);
+app.use('/categories', categoryRoutes);
+app.use('/transactions', transactionRoutes);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
