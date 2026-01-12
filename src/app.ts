@@ -8,6 +8,7 @@ import { categoryRoutes } from './routes/category.routes';
 import { transactionRoutes } from './routes/transaction.routes';
 import { budgetRoutes } from './routes/budget.routes';
 import { goalRoutes } from './routes/goal.routes';
+import reportRoutes from './routes/report.routes';
 import { errorHandler } from './middlewares/errorHandler';
 import { globalLimiter } from './middlewares/rateLimiter';
 import { requestId } from './middlewares/requestId';
@@ -33,6 +34,7 @@ app.use('/categories', categoryRoutes);
 app.use('/transactions', transactionRoutes);
 app.use('/budgets', budgetRoutes);
 app.use('/goals', goalRoutes);
+app.use('/reports', reportRoutes);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
