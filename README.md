@@ -1,112 +1,112 @@
-# Backend App - Personal Finance Manager
+# Backend App - Gerenciador de Finanças Pessoais
 
-Welcome to the **Personal Finance Manager**! This robust backend application is designed to help you take control of your financial life. Built with a modern, type-safe stack, it provides all the tools necessary to track expenses, manage budgets, set ambitious financial goals, and even automate those pesky recurring payments.
+Bem-vindo ao **Gerenciador de Finanças Pessoais**! Criei esta aplicação backend robusta para ajudar você a assumir o controle da sua vida financeira. Construída com uma stack moderna e tipada, ela fornece todas as ferramentas necessárias para rastrear despesas, gerenciamento de orçamentos, definição de metas financeiras ambiciosas e até mesmo a automação daqueles pagamentos recorrentes chatos.
 
-We've focused on creating a secure, scalable, and maintainable RESTful API that can serve as the solid foundation for any frontend interface, whether it's a mobile app or a web dashboard.
-
----
-
-## 📋 Table of Contents
-
-- [About the Project](#-about-the-project)
-- [How It Works](#-how-it-works)
-- [Getting Started](#-getting-started)
-- [Architecture & Design](#-architecture--design)
-- [Development Workflow](#-development-workflow)
+Meu foco foi criar uma API RESTful segura, escalável e de fácil manutenção, que sirva como uma fundação sólida para qualquer interface frontend, seja um aplicativo móvel ou um painel web.
 
 ---
 
-## � About the Project
+## 📋 Índice
 
-Managing money shouldn't be a chore. This project simplifies financial tracking by offering a complete suite of features:
-
-- **Smart Transaction Tracking**: Record every income and expense with detail. We support multiple **wallets** (like Cash, Bank Accounts, or Savings) so you can keep funds separate but view your total net worth in your preferred currency (defaulting to BRL).
-- **Automated Recurring Transactions**: Stop manually entering your Netflix subscription or rent every month. With our powerful CRON-based scheduler, you can set up transactions once—monthly, weekly, or on custom schedules—and the system handles the rest automatically.
-- **Budgets & Goals**: Keep your spending in check by setting monthly **Budgets** for specific categories (like "Dining Out" or "Transport"). Planning for a dream vacation? Create **Goals** with deadlines and track your progress as you save.
-- **Secure & Private**: Your data is protected with industry-standard BCrypt password encryption and JWT (JSON Web Token) authentication, ensuring only you have access to your financial details.
-
-### The Tech Stack
-
-Use the power of **TypeScript** and **Node.js** for a reliable runtime. We rely on **Express** for handling requests efficiently, while **Prisma** serves as our modern ORM, making database interactions with **PostgreSQL** type-safe and intuitive. To ensure performance, we use **Redis** for caching and managing distributed tasks, ensuring the app stays fast even under load.
+- [Sobre o Projeto](#-sobre-o-projeto)
+- [Como Funciona](#-como-funciona)
+- [Começando](#-começando)
+- [Arquitetura e Design](#-arquitetura-e-design)
+- [Fluxo de Trabalho](#-fluxo-de-trabalho)
 
 ---
 
-## 🏗 Architecture & Design
+## 💡 Sobre o Projeto
 
-We believe in clean code that is easy to maintain and scale. This project follows a strict **Layered Architecture**, separating concerns into distinct logical components:
+Gerenciar dinheiro não deveria ser uma tarefa árdua. Desenvolvi este projeto para simplificar o rastreamento financeiro, oferecendo um conjunto completo de funcionalidades:
 
-1. **Controllers**: The entry point for all requests. They handle the "what" — validating your input and deciding which service to call.
-2. **Services**: The heart of the application. This is where the business logic lives. Whether it's calculating a new wallet balance or processing a recurring payment, the Service layer handles the "how".
-3. **Repositories & Prisma**: Use Prisma to interact deeply with our PostgreSQL database, ensuring data integrity without successful SQL injection risks.
+- **Rastreamento Inteligente de Transações**: Registre cada receita e despesa com detalhes. Implementei suporte a múltiplas **carteiras** (como Dinheiro, Conta Bancária ou Poupança) para que você possa separar os fundos, mas ainda visualizar seu patrimônio líquido total na sua moeda preferida (padrão BRL).
+- **Transações Recorrentes Automatizadas**: Pare de lançar manualmente sua assinatura da Netflix ou o aluguel todo mês. Com o agendador baseado em CRON que configurei, você define as transações uma vez — mensalmente, semanalmente ou em horários personalizados — e o sistema cuida do resto automaticamente.
+- **Orçamentos e Metas**: Mantenha seus gastos sob controle definindo **Orçamentos** mensais para categorias específicas. Planejando as férias dos sonhos? Cries **Metas** com prazos e acompanhe seu progresso enquanto economiza.
+- **Segurança e Privacidade**: Protegi seus dados com criptografia de senha padrão da indústria (BCrypt) e autenticação JWT (JSON Web Token), garantindo que apenas você tenha acesso aos seus detalhes financeiros.
 
-We also employ **Middlewares** to handle cross-cutting concerns like security. Before a request reaches a controller, it passes through our authentication gates and validation checks (powered by **Zod**), so bad data never even touches our core logic.
+### Tecnologias Utilizadas
+
+Utilizei o poder do **TypeScript** e **Node.js** para garantir um tempo de execução confiável. Escolhi o **Express** para lidar com requisições de forma eficiente, enquanto o **Prisma** serve como ORM moderno, tornando as interações com o banco de dados **PostgreSQL** intuitivas e seguras. Para garantir desempenho, implementei **Redis** para cache e gerenciamento de tarefas distribuídas, assegurando que o app permaneça rápido mesmo sob carga.
 
 ---
 
-## � Getting Started
+## 🏗 Arquitetura e Design
 
-Ready to run the project? We've made it easy using Docker.
+Acredito em código limpo, fácil de manter e escalar. Por isso, este projeto segue uma **Arquitetura em Camadas** estrita, separando responsabilidades em componentes lógicos distintos:
 
-### Prerequisites
+1. **Controllers**: O ponto de entrada para todas as requisições. Eles lidam com o "o quê" — validando a entrada e decidindo qual serviço chamar.
+2. **Services**: O coração da aplicação. É aqui que coloquei a regra de negócio. Seja calculando o novo saldo de uma carteira ou processando um pagamento recorrente, a camada de Serviço lida com o "como".
+3. **Repositories & Prisma**: Usam o Prisma para interagir profundamente com o banco de dados PostgreSQL, garantindo integridade dos dados sem riscos de injeção de SQL.
 
-You'll need **Node.js** (v18+) and **Docker** installed on your machine. Docker allows us to spin up the database and Redis without you needing to install them manually.
+Também empreguei **Middlewares** para lidar com preocupações transversais como segurança. Antes de uma requisição chegar a um controller, ela passa pelos portões de autenticação e verificações de validação (impulsionadas pelo **Zod**) que configurei, para que dados inválidos nunca toquem a lógica principal.
 
-### Installation
+---
 
-1. **Clone the code**:
+## 🚀 Começando
+
+Pronto para rodar o projeto? Facilitei tudo usando Docker.
+
+### Pré-requisitos
+
+Você precisará do **Node.js** (v18+) e **Docker** instalados na sua máquina. O Docker permite subir o banco de dados e o Redis sem que você precise instalá-los manualmente.
+
+### Instalação
+
+1. **Clone o código**:
 
     ```bash
-    git clone <repository-url>
+    git clone <url-do-repositorio>
     cd backend-app
     ```
 
-2. **Install dependencies**:
-    Grab all the necessary libraries.
+2. **Instale as dependências**:
+    Baixe todas as bibliotecas necessárias.
 
     ```bash
     npm install
     ```
 
-3. **Wake up the infrastructure**:
-    Use Docker Compose to start PostgreSQL and Redis in the background.
+3. **Suba a infraestrutura**:
+    Use o Docker Compose para iniciar o PostgreSQL e o Redis em segundo plano.
 
     ```bash
     docker-compose up -d
     ```
 
-4. **Set up your environment**:
-    Create a `.env` file in the root folder. You'll need to define your `DATABASE_URL`, `REDIS_URL`, and a secure `JWT_SECRET`. Check the `prisma/schema.prisma` or the example config for guidance.
+4. **Configure seu ambiente**:
+    Crie um arquivo `.env` na raiz do projeto. Você precisará definir seu `DATABASE_URL`, `REDIS_URL` e uma `JWT_SECRET` segura. Verifique o `prisma/schema.prisma` ou o arquivo de exemplo para orientação.
 
-5. **Initialize the Database**:
-    Apply our schema to your new local database.
+5. **Inicialize o Banco de Dados**:
+    Aplique o schema ao seu novo banco de dados local.
 
     ```bash
     npx prisma migrate dev
     ```
 
-6. **Run the App**:
-    Start the development server.
+6. **Rode o App**:
+    Inicie o servidor de desenvolvimento.
 
     ```bash
     npm run dev
     ```
 
-    Your API is now live at `http://localhost:3000`!
+    Sua API agora está viva em `http://localhost:3000`!
 
 ---
 
-## � Development Workflow
+## 🔄 Fluxo de Trabalho (Gitflow)
 
-We use a structured **Gitflow** process to keep our codebase clean and stable.
+Utilizo um processo estruturado de **Gitflow** para manter a base de código limpa e estável.
 
-- **Main Branch**: This is our production-ready state. If it's on `main`, it's stable.
-- **Develop Branch**: The integration hub. All new features land here first for testing.
-- **Feature Branches**: Working on something new? Create a branch like `feature/my-new-feature` from `develop`. Once you're done, open a Pull Request to merge it back.
+- **Main Branch**: É o estado pronto para produção. Se está na `main`, está estável.
+- **Develop Branch**: O hub de integração. Todas as novas funcionalidades que desenvolvo pousam aqui primeiro para testes.
+- **Feature Branches**: Trabalhando em algo novo? Eu crio uma branch como `feature/minha-nova-funcionalidade` a partir da `develop`. Quando termino, abro um Pull Request para mesclar de volta.
 
-This ensures that we can experiment and build rapidly without breaking the core application.
+Isso garante que eu possa experimentar e construir rapidamente sem quebrar a aplicação principal.
 
 ---
 
-## 🧪 Testing
+## 🧪 Testes
 
-Quality is key. We use **Jest** to run a comprehensive suite of tests. You can run `npm test` to verify everything from simple unit logic to full end-to-end user flows (like creating a recurring transaction and ensuring it processes correctly).
+Qualidade é a chave. Utilizo **Jest** para rodar uma suíte abrangente de testes. Você pode rodar `npm test` para verificar tudo, desde lógicas unitárias simples até fluxos de usuário completos (como criar uma transação recorrente e garantir que ela seja processada corretamente).
