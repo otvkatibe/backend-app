@@ -56,7 +56,8 @@ jobs:
       run: npm test
       env:
         DATABASE_URL: postgres://user:password@localhost:5432/testdb
-        DATABASE_URL: postgres://user:password@localhost:5432/testdb
         JWT_SECRET: test_secret_key
+        JWT_REFRESH_SECRET: test_refresh_secret_key
+        CORS_ORIGINS: http://localhost:3000
         REDIS_HOST: localhost
         REDIS_PORT: 6379
