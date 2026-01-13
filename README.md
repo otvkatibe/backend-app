@@ -138,6 +138,25 @@ Isso garante que eu possa experimentar e construir rapidamente sem quebrar a apl
 
 ---
 
+## 📚 Documentação da API
+
+A documentação completa da API está disponível via **Swagger/OpenAPI**. Após iniciar a aplicação, acesse:
+
+- **Swagger UI**: `http://localhost:3000/api-docs`
+- **JSON Spec**: `http://localhost:3000/api-docs.json`
+
+---
+
 ## 🧪 Testes
 
-Qualidade é a chave. Utilizo **Jest** para rodar uma suíte abrangente de testes. Você pode rodar `npm test` para verificar tudo, desde lógicas unitárias simples até fluxos de usuário completos (como criar uma transação recorrente e garantir que ela seja processada corretamente).
+Qualidade é a chave. Utilizo **Jest** para rodar uma suíte abrangente de testes.
+
+```bash
+# Executa todos os testes (série)
+npm test
+
+# Executa testes em modo watch
+npm run test:watch
+```
+
+Nossa suíte cobre fluxos de Autenticação (RBAC), Transações Financeiras, Relatórios e Lógica de Recorrência.
