@@ -10,9 +10,14 @@ class CacheService {
             host: process.env.REDIS_HOST || 'localhost',
             port: Number(process.env.REDIS_PORT) || 6379,
             password: process.env.REDIS_PASSWORD || undefined,
-            maxRetriesPerRequest: 1,
-            enableOfflineQueue: false,
+            maxRetriesPerRequest: 1, // Fail fast for commands
+            enableOfflineQueue: false, // Do not queue commands if disconnected
             lazyConnect: true,
+            retryStrategy: (times) => {
+                // Exponential backoff with max delay of 2 seconds
+                const delay = Math.min(times * 50, 2000);
+                return delay;
+            }
         });
 
         this.redis.on('connect', () => {
