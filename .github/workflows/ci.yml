@@ -5,10 +5,14 @@ on:
     branches: [ main, develop, 'feature/*', 'release/*', 'hotfix/*' ]
   pull_request:
     branches: [ main, develop, 'feature/*', 'release/*', 'hotfix/*' ]
+  workflow_dispatch:
 
 jobs:
   test:
+    name: Build & Test
     runs-on: ubuntu-latest
+    env:
+      CI: true
 
     services:
       postgres:
