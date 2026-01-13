@@ -55,43 +55,13 @@ export class RecurringTransactionService {
 
         for (const recurring of dueTransactions) {
             try {
-                // Use a transaction to ensure atomicity
-                const result = await prisma.$transaction(async (tx) => {
-                    // 1. Create the actual transaction
-                    const transaction = await tx.transaction.create({
-                        data: {
-                            amount: recurring.amount,
-                            type: recurring.type,
-                            description: recurring.description || `Recurring: ${recurring.interval}`,
-                            date: now,
-                            walletId: recurring.walletId,
-                            categoryId: recurring.categoryId
-                        }
-                    });
-
-                    // 2. Update Wallet Balance
-                    const adjustment = recurring.type === 'INCOME' ? recurring.amount : recurring.amount.mul(-1);
-                    await tx.wallet.update({
-                        where: { id: recurring.walletId },
-                        data: { balance: { increment: adjustment } }
-                    });
-
-                    // 3. Calculate next run
-                    const interval = (CronParser as any).parse(recurring.interval, { currentDate: now, strict: false });
-                    const nextRun = interval.next().toDate();
-
-                    // 4. Update Recurring Record
-                    await tx.recurringTransaction.update({
-                        where: { id: recurring.id },
-                        data: {
-                            lastRun: now,
-                            nextRun
-                        }
-                    });
-
-                    return transaction;
-                });
-                results.push({ id: recurring.id, status: 'success', transactionId: result.id });
+                const transaction = await this.processSingleTransaction(recurring.id, now);
+                if (transaction) {
+                    results.push({ id: recurring.id, status: 'success', transactionId: transaction.id });
+                } else {
+                    // Skipped (already processed)
+                    results.push({ id: recurring.id, status: 'skipped' });
+                }
             } catch (error: any) {
                 console.error(`[Recurring] Failed to process ${recurring.id}:`, error);
                 results.push({ id: recurring.id, status: 'failed', error: error.message });
@@ -99,6 +69,66 @@ export class RecurringTransactionService {
         }
 
         return results;
+    }
+
+    /**
+     * Processes a single recurring transaction with idempotency and atomicity checks.
+     * @param id RecurringTransaction ID
+     * @param executionDate Date of execution
+     * @returns The created transaction or null if skipped
+     */
+    private async processSingleTransaction(id: string, executionDate: Date) {
+        return await prisma.$transaction(async (tx) => {
+            // 1. Re-fetch transaction (Optimistic Locking / Idempotency Check)
+            const freshRecurring = await tx.recurringTransaction.findUnique({
+                where: { id }
+            });
+
+            // If it disappeared or nextRun was already pushed forward by another process
+            if (!freshRecurring || !freshRecurring.isActive || freshRecurring.nextRun > executionDate) {
+                return null; // Skip silently (already processed)
+            }
+
+            // 2. Create the actual transaction
+            const transaction = await tx.transaction.create({
+                data: {
+                    amount: freshRecurring.amount,
+                    type: freshRecurring.type,
+                    description: freshRecurring.description || `Recurring: ${freshRecurring.interval}`,
+                    date: executionDate,
+                    walletId: freshRecurring.walletId,
+                    categoryId: freshRecurring.categoryId
+                }
+            });
+
+            // 3. Update Wallet Balance
+            const adjustment = freshRecurring.type === 'INCOME'
+                ? freshRecurring.amount
+                : freshRecurring.amount.mul(-1);
+
+            await tx.wallet.update({
+                where: { id: freshRecurring.walletId },
+                data: { balance: { increment: adjustment } }
+            });
+
+            // 4. Calculate next run
+            const interval = (CronParser as any).parse(freshRecurring.interval, {
+                currentDate: executionDate,
+                strict: false
+            });
+            const nextRun = interval.next().toDate();
+
+            // 5. Update Recurring Record
+            await tx.recurringTransaction.update({
+                where: { id: freshRecurring.id },
+                data: {
+                    lastRun: executionDate,
+                    nextRun
+                }
+            });
+
+            return transaction;
+        });
     }
 
     async list(userId: string) {
