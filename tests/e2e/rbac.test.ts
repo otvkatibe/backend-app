@@ -41,14 +41,14 @@ describe('E2E RBAC', () => {
             email: adminUser.email,
             password: adminUser.password
         });
-        adminToken = adminLogin.body.token;
+        adminToken = adminLogin.body.accessToken;
 
         // 5. Login Regular User
         const userLogin = await request(app).post('/login').send({
             email: regularUser.email,
             password: regularUser.password
         });
-        userToken = userLogin.body.token;
+        userToken = userLogin.body.accessToken;
     });
 
     afterAll(async () => {

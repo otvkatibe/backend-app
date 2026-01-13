@@ -28,7 +28,7 @@ describe('E2E Reports', () => {
             email: testUser.email,
             password: testUser.password
         });
-        token = loginRes.body.token;
+        token = loginRes.body.accessToken;
 
         // Create Category
         const catRes = await request(app)

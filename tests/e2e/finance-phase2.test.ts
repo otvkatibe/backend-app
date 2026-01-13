@@ -27,7 +27,7 @@ describe('Modulo Financeiro Fase 2 E2E', () => {
             email: 'testphase2@example.com',
             password: 'password123'
         });
-        token = loginRes.body.token;
+        token = loginRes.body.accessToken;
 
         // Create Category (Dependency for Budget)
         const catRes = await request(app)

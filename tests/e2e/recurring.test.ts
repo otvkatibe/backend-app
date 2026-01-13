@@ -32,7 +32,7 @@ describe('E2E Recurring Transactions', () => {
             email: testUser.email,
             password: testUser.password
         });
-        token = loginRes.body.token;
+        token = loginRes.body.accessToken;
 
         // Create Wallet
         const walletRes = await request(app)

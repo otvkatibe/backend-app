@@ -18,6 +18,15 @@ export class UserController {
         return res.status(200).json(result);
     }
 
+    async refreshToken(req: Request, res: Response) {
+        const { refreshToken } = req.body;
+        if (!refreshToken) {
+            return res.status(400).json({ error: 'Refresh token is required' });
+        }
+        const result = await userService.refreshToken(refreshToken);
+        return res.status(200).json(result);
+    }
+
     async getProfile(req: Request, res: Response) {
         const userId = (req as any).userId; // Injected by ensureAuthenticated
         const user = await userService.getProfile(userId);

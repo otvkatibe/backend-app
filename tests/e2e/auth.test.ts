@@ -42,7 +42,38 @@ describe('E2E Auth', () => {
             });
 
         expect(res.status).toBe(200);
-        expect(res.body).toHaveProperty('token');
+        expect(res.body).toHaveProperty('accessToken');
+        expect(res.body).toHaveProperty('refreshToken');
+    });
+
+    it('should refresh access token', async () => {
+        // 1. Login to get refresh token
+        const loginRes = await request(app)
+            .post('/login')
+            .send({
+                email: testUser.email,
+                password: testUser.password
+            });
+
+        const { refreshToken } = loginRes.body;
+
+        // 2. Use refresh token to get new access token
+        const refreshRes = await request(app)
+            .post('/auth/refresh-token')
+            .send({ refreshToken });
+
+        expect(refreshRes.status).toBe(200);
+        expect(refreshRes.body).toHaveProperty('accessToken');
+        expect(refreshRes.body).toHaveProperty('refreshToken');
+        expect(refreshRes.body.accessToken).not.toBe(loginRes.body.accessToken); // Should be rotated/new
+    });
+
+    it('should fail refresh with invalid token', async () => {
+        const res = await request(app)
+            .post('/auth/refresh-token')
+            .send({ refreshToken: 'invalid_token' });
+
+        expect(res.status).toBe(401);
     });
 
     it('should fail login with wrong password', async () => {

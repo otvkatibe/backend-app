@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { cacheService } from './cache.service';
 import { prisma } from '../utils/prisma';
 import { AppError } from '../utils/AppError';
-import { sign } from '../utils/jwt';
+import { sign, generateAccessToken, generateRefreshToken as genRefreshToken, verify } from '../utils/jwt';
 import { z } from 'zod';
 import { createUserSchema, loginSchema } from '../schemas/user.schema';
 import { calculatePagination } from '../utils/prismaHelper';
@@ -59,9 +59,73 @@ export class UserService {
             throw new AppError('Email ou senha invalidos', 401);
         }
 
-        const token = sign({ id: user.id, role: user.role });
+        // Generate tokens
+        const accessToken = generateAccessToken({ id: user.id, role: user.role });
+        const refreshToken = genRefreshToken({ id: user.id, role: user.role });
 
-        return { user, token };
+        // Save refresh token to database
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7);
+
+        await prisma.refreshToken.create({
+            data: {
+                token: refreshToken,
+                userId: user.id,
+                expiresAt
+            }
+        });
+
+        return {
+            user: { id: user.id, name: user.name, email: user.email, role: user.role },
+            accessToken,
+            refreshToken
+        };
+    }
+
+    async refreshToken(token: string) {
+        // 1. Verify if token is valid
+        try {
+            verify(token, true);
+        } catch (err) {
+            throw new AppError('Refresh token invalido ou expirado', 401);
+        }
+
+        // 2. Check in database
+        const storedToken = await prisma.refreshToken.findUnique({
+            where: { token },
+            include: { user: true }
+        });
+
+        if (!storedToken) {
+            throw new AppError('Refresh token invalido', 401);
+        }
+
+        if (storedToken.revoked) {
+            // Security: Reuse detection could revoke all tokens here
+            throw new AppError('Refresh token revogado', 401);
+        }
+
+        // 3. Rotate token
+        await prisma.refreshToken.update({
+            where: { id: storedToken.id },
+            data: { revoked: true }
+        });
+
+        const newAccessToken = generateAccessToken({ id: storedToken.user.id, role: storedToken.user.role });
+        const newRefreshToken = genRefreshToken({ id: storedToken.user.id, role: storedToken.user.role });
+
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7);
+
+        await prisma.refreshToken.create({
+            data: {
+                token: newRefreshToken,
+                userId: storedToken.userId,
+                expiresAt
+            }
+        });
+
+        return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     }
 
     async getProfile(userId: string) {

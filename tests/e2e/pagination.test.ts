@@ -32,7 +32,7 @@ describe('E2E Pagination', () => {
             email: adminUser.email,
             password: adminUser.password
         });
-        adminToken = loginRes.body.token;
+        adminToken = loginRes.body.accessToken;
 
         // 3. Seed 20 Users for pagination testing
         const usersToCreate = [];
