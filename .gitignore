@@ -3,3 +3,22 @@ dist
 .env
 
 /src/generated/prisma
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Diagnostics
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Coverage
+coverage
+
+# OS
+.DS_Store
+Thumbs.db
