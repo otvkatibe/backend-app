@@ -1,0 +1,41 @@
+[32minfo[39m: Redis connected successfully {"timestamp":"2026-01-13T04:57:57.019Z"}
+[33mwarn[39m: Request failed {"duration":"1217ms","ip":"::ffff:127.0.0.1","method":"GET","requestId":"8bdefd22-cfc6-44db-9d8d-b210b65e14d4","status":503,"timestamp":"2026-01-13T04:57:58.688Z","url":"/health"}
+  console.log
+    HEALTH CHECK RESPONSE: {
+      "status": "DOWN",
+      "timestamp": "2026-01-13T04:57:58.685Z",
+      "services": {
+        "database": "UP",
+        "redis": "DOWN"
+      }
+    }
+
+      at Object.<anonymous> (tests/e2e/health.test.ts:20:17)
+
+FAIL tests/e2e/health.test.ts
+  E2E Health Check
+    × should return 200 UP (1254 ms)
+
+  ● E2E Health Check › should return 200 UP
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 503
+
+    [0m [90m 19 |[39m         [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39m[36mget[39m([32m'/health'[39m)[33m;[39m
+     [90m 20 |[39m         console[33m.[39mlog([32m'HEALTH CHECK RESPONSE:'[39m[33m,[39m [33mJSON[39m[33m.[39mstringify(res[33m.[39mbody[33m,[39m [36mnull[39m[33m,[39m [35m2[39m))[33m;[39m
+    [31m[1m>[22m[39m[90m 21 |[39m         expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m    |[39m                            [31m[1m^[22m[39m
+     [90m 22 |[39m         expect(res[33m.[39mbody[33m.[39mstatus)[33m.[39mtoBe([32m'UP'[39m)[33m;[39m
+     [90m 23 |[39m         expect(res[33m.[39mbody[33m.[39mservices[33m.[39mdatabase)[33m.[39mtoBe([32m'UP'[39m)[33m;[39m
+     [90m 24 |[39m         expect(res[33m.[39mbody[33m.[39mservices[33m.[39mredis)[33m.[39mtoBe([32m'UP'[39m)[33m;[39m[0m
+
+      at Object.<anonymous> (tests/e2e/health.test.ts:21:28)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 total
+Snapshots:   0 total
+Time:        2.415 s, estimated 3 s
+Ran all test suites matching tests/e2e/health.test.ts.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?
