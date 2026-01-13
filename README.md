@@ -1,5 +1,15 @@
 # Backend App - Gerenciador de Finanças Pessoais
 
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)
+![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
+![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+
+> 🚧 **Status do Projeto**: Em Desenvolvimento (Work in Progress) 🚧
+
 Bem-vindo ao **Gerenciador de Finanças Pessoais**! Criei esta aplicação backend robusta para ajudar você a assumir o controle da sua vida financeira. Construída com uma stack moderna e tipada, ela fornece todas as ferramentas necessárias para rastrear despesas, gerenciamento de orçamentos, definição de metas financeiras ambiciosas e até mesmo a automação daqueles pagamentos recorrentes chatos.
 
 Meu foco foi criar uma API RESTful segura, escalável e de fácil manutenção, que sirva como uma fundação sólida para qualquer interface frontend, seja um aplicativo móvel ou um painel web.
@@ -9,10 +19,9 @@ Meu foco foi criar uma API RESTful segura, escalável e de fácil manutenção, 
 ## 📋 Índice
 
 - [Sobre o Projeto](#-sobre-o-projeto)
-- [Como Funciona](#-como-funciona)
 - [Começando](#-começando)
 - [Arquitetura e Design](#-arquitetura-e-design)
-- [Fluxo de Trabalho](#-fluxo-de-trabalho)
+- [Fluxo de Trabalho](#-fluxo-de-trabalho-gitflow)
 
 ---
 
