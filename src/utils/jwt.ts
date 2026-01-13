@@ -1,6 +1,10 @@
 import jwt from 'jsonwebtoken';
 
-const SECRET = process.env.JWT_SECRET || 'default_secret';
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+    throw new Error('FATAL: JWT_SECRET environment variable is required in production.');
+}
+
+const SECRET = process.env.JWT_SECRET || 'dev_secret_unsafe';
 
 export type Role = 'USER' | 'ADMIN';
 

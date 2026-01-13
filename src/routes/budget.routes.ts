@@ -8,7 +8,58 @@ const budgetRoutes = Router();
 
 budgetRoutes.use(ensureAuthenticated);
 
-budgetRoutes.post('/', validate(upsertBudgetSchema), (req, res, next) => budgetController.upsert(req, res).catch(next));
-budgetRoutes.get('/', validate(listBudgetsSchema), (req, res, next) => budgetController.list(req, res).catch(next));
+/**
+ * @swagger
+ * tags:
+ *   name: Budgets
+ *   description: Budget management
+ */
+
+/**
+ * @swagger
+ * /budgets:
+ *   post:
+ *     summary: Create or update budget (Upsert)
+ *     tags: [Budgets]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpsertBudgetDTO'
+ *     responses:
+ *       200:
+ *         description: Budget created/updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Budget'
+ */
+budgetRoutes.post('/', validate(upsertBudgetSchema), budgetController.upsert);
+
+/**
+ * @swagger
+ * /budgets:
+ *   get:
+ *     summary: List budgets
+ *     tags: [Budgets]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: month
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: year
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: List of budgets
+ */
+budgetRoutes.get('/', validate(listBudgetsSchema), budgetController.list);
 
 export { budgetRoutes };

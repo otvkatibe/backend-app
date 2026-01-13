@@ -15,14 +15,15 @@ describe('Modulo Financeiro Fase 2 E2E', () => {
         await clearDatabase();
 
         // Create User & Login
-        const userRes = await request(app).post('/users/register').send({
+        const userRes = await request(app).post('/users').send({
             name: 'Test User Phase 2',
             email: 'testphase2@example.com',
-            password: 'password123'
+            password: 'password123',
+            role: 'USER'
         });
         userId = userRes.body.id;
 
-        const loginRes = await request(app).post('/users/login').send({
+        const loginRes = await request(app).post('/login').send({
             email: 'testphase2@example.com',
             password: 'password123'
         });

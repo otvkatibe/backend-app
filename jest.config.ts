@@ -14,6 +14,7 @@ const config: Config = {
         '^.+\\.[tj]sx?$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
     },
     transformIgnorePatterns: ['node_modules/(?!(uuid)/)'],
+    setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
 };
 
 export default config;

@@ -97,6 +97,13 @@ class CacheService {
     public async disconnect(): Promise<void> {
         await this.redis.quit();
     }
+
+    /**
+     * Get the underlying Redis client instance
+     */
+    public getRedisClient(): Redis {
+        return this.redis;
+    }
 }
 
 export const cacheService = CacheService.getInstance();

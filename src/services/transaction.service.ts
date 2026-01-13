@@ -1,7 +1,7 @@
 import { prisma } from '../utils/prisma';
 import { CreateTransactionDTO, ListTransactionsDTO } from '../schemas/transaction.schema';
 import { AppError } from '../utils/AppError';
-import { Transaction } from '@prisma/client';
+import { Transaction, Prisma } from '@prisma/client';
 
 
 export class TransactionService {
@@ -34,7 +34,9 @@ export class TransactionService {
                 },
             });
 
-            const balanceChange = type === 'INCOME' ? amount : -amount;
+            // Use Prisma.Decimal to avoid floating point errors
+            const amountDecimal = new Prisma.Decimal(amount);
+            const balanceChange = type === 'INCOME' ? amountDecimal : amountDecimal.mul(-1);
 
             await tx.wallet.update({
                 where: { id: walletId },

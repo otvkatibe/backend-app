@@ -4,7 +4,7 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --runInBand",
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "nodemon --exec ts-node src/index.ts",
@@ -55,6 +55,7 @@
     "pdfkit": "^0.17.2",
     "pg": "^8.16.3",
     "prisma": "^7.2.0",
+    "rate-limit-redis": "^4.3.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^13.0.0",
@@ -64,7 +65,7 @@
   "lint-staged": {
     "*.ts": [
       "npx prettier --write",
-      "npm test -- --findRelatedTests --passWithNoTests"
+      "npm test -- --findRelatedTests --passWithNoTests --runInBand"
     ]
   }
 }

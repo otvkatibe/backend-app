@@ -13,7 +13,7 @@ export const listBudgetsSchema = z.object({
     query: z.object({
         month: z.string().regex(/^\d+$/).transform(Number).optional(),
         year: z.string().regex(/^\d+$/).transform(Number).optional(),
-        page: z.string().regex(/^\d+$/).optional(),
-        limit: z.string().regex(/^\d+$/).optional(),
+        page: z.string().regex(/^\d+$/).transform(Number).optional(),
+        limit: z.string().regex(/^\d+$/).transform(Number).optional(),
     }).optional(),
 });
