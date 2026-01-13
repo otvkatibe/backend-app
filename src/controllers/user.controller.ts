@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { UserService } from '../services/user.service';
 import { createUserSchema, loginSchema } from '../schemas/user.schema';
 import { PaginationOptions } from '../types/PaginationTypes';
+import { AppError } from '../utils/AppError';
 
 const userService = new UserService();
 
@@ -21,7 +22,7 @@ export class UserController {
     async refreshToken(req: Request, res: Response) {
         const { refreshToken } = req.body;
         if (!refreshToken) {
-            return res.status(400).json({ error: 'Refresh token is required' });
+            throw new AppError('Refresh token is required', 400);
         }
         const result = await userService.refreshToken(refreshToken);
         return res.status(200).json(result);
