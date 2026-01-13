@@ -7,7 +7,8 @@
     "test": "jest",
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "nodemon --exec ts-node src/index.ts"
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
@@ -28,7 +29,9 @@
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "@types/uuid": "^11.0.0",
+    "husky": "^9.1.7",
     "jest": "^30.2.0",
+    "lint-staged": "^16.2.7",
     "nodemon": "^3.1.11",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.6",
@@ -57,5 +60,11 @@
     "uuid": "^13.0.0",
     "winston": "^3.19.0",
     "zod": "^4.3.5"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "npx prettier --write",
+      "npm test -- --findRelatedTests --passWithNoTests"
+    ]
   }
 }
