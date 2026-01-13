@@ -40,6 +40,28 @@ Utilizei o poder do **TypeScript** e **Node.js** para garantir um tempo de execu
 
 ---
 
+## 🛡️ Confiabilidade e Segurança (Hardening)
+
+Seguindo as melhores práticas de engenharia de software, implementei uma série de proteções para garantir que o sistema seja robusto e confiável, mesmo em cenários adversos:
+
+### 1. Sistema Anti-Cobrança Dupla (Idempotência)
+
+Nas **Transações Recorrentes**, implementei um sistema de bloqueio otimista e verificação dupla. Antes de processar qualquer agendamento, o sistema confirma atomicamente se aquela execução específica já ocorreu. Isso impede que bugs no agendador ou reinicializações do servidor causem cobranças duplicadas na conta do usuário.
+
+### 2. Resiliência a Falhas (Redis)
+
+O cache não é apenas rápido, ele é inteligente. Configurei o cliente Redis com uma estratégia de **reconexão exponencial (backoff)**. Se a conexão cair, a aplicação não entra em pânico; ela tenta reconectar gradualmente, evitando sobrecarregar o banco de dados ou travar a API.
+
+### 3. Precisão Financeira Decimal
+
+Dinheiro exige exatidão. Abandonei a matemática de ponto flutuante padrão do JavaScript (que considera `0.1 + 0.2 = 0.30000000000000004`) e migrei todos os cálculos de saldo para **Decimal**. Isso garante precisão absoluta até o último centavo.
+
+### 4. Proteção de Dados (Audit BOLA)
+
+Cada endpoint de carteira e transação passa por verificações rigorosas de propriedade. Um usuário **jamais** consegue acessar ou manipular dados de outra pessoa apenas "adivinhando" um ID, pois cada query no banco valida o `userId` autenticado.
+
+---
+
 ## 🏗 Arquitetura e Design
 
 Acredito em código limpo, fácil de manter e escalar. Por isso, este projeto segue uma **Arquitetura em Camadas** estrita, separando responsabilidades em componentes lógicos distintos:
