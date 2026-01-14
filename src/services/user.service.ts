@@ -1,196 +1,193 @@
-import bcrypt from 'bcrypt';
-import { cacheService } from './cache.service';
-import { prisma } from '../utils/prisma';
-import { AppError } from '../utils/AppError';
-import { sign, generateAccessToken, generateRefreshToken as genRefreshToken, verify } from '../utils/jwt';
-import { z } from 'zod';
-import { createUserSchema, loginSchema } from '../schemas/user.schema';
-import { calculatePagination } from '../utils/prismaHelper';
-import { PaginationOptions, PaginatedResult } from '../types/PaginationTypes';
+import bcrypt from "bcrypt";
+import { cacheService } from "./cache.service";
+import { AppError } from "../utils/AppError";
+import {
+  generateAccessToken,
+  generateRefreshToken as genRefreshToken,
+  verify,
+} from "../utils/jwt";
+import { z } from "zod";
+import { createUserSchema, loginSchema } from "../schemas/user.schema";
+import { calculatePagination } from "../utils/prismaHelper";
+import { PaginationOptions, PaginatedResult } from "../types/PaginationTypes";
+import { IUserRepository } from "../repositories/interfaces/IUserRepository";
+import { ITokenRepository } from "../repositories/interfaces/ITokenRepository";
 
 type CreateUserDTO = z.infer<typeof createUserSchema>;
 type LoginDTO = z.infer<typeof loginSchema>;
 
 export class UserService {
-    async create(data: CreateUserDTO) {
-        const userExists = await prisma.user.findUnique({
-            where: { email: data.email },
-        });
+  constructor(
+    private userRepository: IUserRepository,
+    private tokenRepository: ITokenRepository,
+  ) {}
 
-        if (userExists) {
-            throw new AppError('Usuario ja existe', 409);
-        }
+  async create(data: CreateUserDTO) {
+    const userExists = await this.userRepository.findByEmail(data.email);
 
-        const hashedPassword = await bcrypt.hash(data.password, 10);
-
-        const user = await prisma.user.create({
-            data: {
-                name: data.name,
-                email: data.email,
-                password: hashedPassword,
-                role: 'USER' // Default role
-            },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                createdAt: true,
-            },
-        });
-
-        // Invalidate list cache
-        await cacheService.del('users:list:*');
-
-        return user;
+    if (userExists) {
+      throw new AppError("Usuario ja existe", 409);
     }
 
-    async authenticate(data: LoginDTO) {
-        const user = await prisma.user.findUnique({
-            where: { email: data.email },
-        });
+    const hashedPassword = await bcrypt.hash(data.password, 10);
 
-        if (!user) {
-            throw new AppError('Email ou senha invalidos', 401);
-        }
+    const user = await this.userRepository.create({
+      name: data.name,
+      email: data.email,
+      password: hashedPassword,
+      role: "USER",
+    });
 
-        const validPassword = await bcrypt.compare(data.password, user.password);
+    // Invalidate list cache
+    await cacheService.del("users:list:*");
 
-        if (!validPassword) {
-            throw new AppError('Email ou senha invalidos', 401);
-        }
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
 
-        // Generate tokens
-        const accessToken = generateAccessToken({ id: user.id, role: user.role });
-        const refreshToken = genRefreshToken({ id: user.id, role: user.role });
+  async authenticate(data: LoginDTO) {
+    const user = await this.userRepository.findByEmail(data.email);
 
-        // Save refresh token to database
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 7);
-
-        await prisma.refreshToken.create({
-            data: {
-                token: refreshToken,
-                userId: user.id,
-                expiresAt
-            }
-        });
-
-        return {
-            user: { id: user.id, name: user.name, email: user.email, role: user.role },
-            accessToken,
-            refreshToken
-        };
+    if (!user) {
+      throw new AppError("Email ou senha invalidos", 401);
     }
 
-    async refreshToken(token: string) {
-        // 1. Verify if token is valid
-        try {
-            verify(token, true);
-        } catch (err) {
-            throw new AppError('Refresh token invalido ou expirado', 401);
-        }
+    const validPassword = await bcrypt.compare(data.password, user.password);
 
-        // 2. Check in database
-        const storedToken = await prisma.refreshToken.findUnique({
-            where: { token },
-            include: { user: true }
-        });
-
-        if (!storedToken) {
-            throw new AppError('Refresh token invalido', 401);
-        }
-
-        if (storedToken.revoked) {
-            // Security: Reuse detection could revoke all tokens here
-            throw new AppError('Refresh token revogado', 401);
-        }
-
-        // 3. Rotate token
-        await prisma.refreshToken.update({
-            where: { id: storedToken.id },
-            data: { revoked: true }
-        });
-
-        const newAccessToken = generateAccessToken({ id: storedToken.user.id, role: storedToken.user.role });
-        const newRefreshToken = genRefreshToken({ id: storedToken.user.id, role: storedToken.user.role });
-
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 7);
-
-        await prisma.refreshToken.create({
-            data: {
-                token: newRefreshToken,
-                userId: storedToken.userId,
-                expiresAt
-            }
-        });
-
-        return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+    if (!validPassword) {
+      throw new AppError("Email ou senha invalidos", 401);
     }
 
-    async getProfile(userId: string) {
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                createdAt: true,
-                updatedAt: true,
-            },
-        });
+    // Generate tokens
+    const accessToken = generateAccessToken({ id: user.id, role: user.role });
+    const refreshToken = genRefreshToken({ id: user.id, role: user.role });
 
-        if (!user) {
-            throw new AppError('Usuario nao encontrado', 404);
-        }
+    // Save refresh token to database
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
 
-        return user;
+    await this.tokenRepository.create({
+      token: refreshToken,
+      userId: user.id,
+      expiresAt,
+    });
+
+    return {
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async refreshToken(token: string) {
+    // 1. Verify if token is valid
+    try {
+      verify(token, true);
+    } catch (err) {
+      throw new AppError("Refresh token invalido ou expirado", 401);
     }
 
-    async listAll(options: PaginationOptions) {
-        const cacheKey = `users:list:${JSON.stringify(options)}`;
-        const cached = await cacheService.get<any>(cacheKey);
+    // 2. Check in database
+    const storedToken = await this.tokenRepository.findByTokenWithUser(token);
 
-        if (cached) {
-            return cached;
-        }
-
-        const { skip, take, page, limit } = calculatePagination(options);
-
-        // Transaction to ensure consistency between data and count
-        const [users, total] = await prisma.$transaction([
-            prisma.user.findMany({
-                skip,
-                take,
-                orderBy: {
-                    name: options.order === 'desc' ? 'desc' : 'asc'
-                },
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    role: true,
-                    createdAt: true
-                }
-            }),
-            prisma.user.count()
-        ]);
-
-        const totalPages = Math.ceil(total / limit);
-
-        const result: PaginatedResult<typeof users[0]> = {
-            data: users,
-            meta: {
-                total,
-                page,
-                limit,
-                totalPages
-            }
-        };
-
-        // Set cache for 60 seconds
-        await cacheService.set(cacheKey, result, 60);
-
-        return result;
+    if (!storedToken) {
+      throw new AppError("Refresh token invalido", 401);
     }
+
+    if (storedToken.revoked) {
+      throw new AppError("Refresh token revogado", 401);
+    }
+
+    // 3. Rotate token
+    await this.tokenRepository.revoke(storedToken.id);
+
+    const newAccessToken = generateAccessToken({
+      id: storedToken.user.id,
+      role: storedToken.user.role,
+    });
+    const newRefreshToken = genRefreshToken({
+      id: storedToken.user.id,
+      role: storedToken.user.role,
+    });
+
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    await this.tokenRepository.create({
+      token: newRefreshToken,
+      userId: storedToken.userId,
+      expiresAt,
+    });
+
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+  }
+
+  async getProfile(userId: string) {
+    const user = await this.userRepository.findById(userId);
+
+    if (!user) {
+      throw new AppError("Usuario nao encontrado", 404);
+    }
+
+    // Manually sanitize since we don't have 'select' in repository generic findById
+    // Ideally repository findById should handle selection or we map here.
+    // For now, simpler:
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+  }
+
+  async listAll(options: PaginationOptions) {
+    const cacheKey = `users:list:${JSON.stringify(options)}`;
+    const cached = await cacheService.get<any>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
+    const { skip, take, page, limit } = calculatePagination(options);
+
+    // Transaction handling for consistency is trickier with repositories unless we expose transaction manager.
+    // For 'list' + 'count', strict consistency is rarely critical in this context versus just calling them.
+    // We will call them separately for now to avoid exposing Prisma transaction types in interface.
+    const users = await this.userRepository.findAll(skip, take, {
+      name: options.order === "desc" ? "desc" : "asc",
+    });
+    const total = await this.userRepository.count();
+
+    const totalPages = Math.ceil(total / limit);
+
+    // Sanitization
+    const sanitizedUsers = users.map((u) => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      createdAt: u.createdAt,
+    }));
+
+    const result: PaginatedResult<(typeof sanitizedUsers)[0]> = {
+      data: sanitizedUsers,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+    };
+
+    // Set cache for 60 seconds
+    await cacheService.set(cacheKey, result, 60);
+
+    return result;
+  }
 }

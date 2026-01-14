@@ -68,7 +68,7 @@ Acredito em código limpo, fácil de manter e escalar. Por isso, este projeto se
 
 1. **Controllers**: O ponto de entrada para todas as requisições. Eles lidam com o "o quê" — validando a entrada e decidindo qual serviço chamar.
 2. **Services**: O coração da aplicação. É aqui que coloquei a regra de negócio. Seja calculando o novo saldo de uma carteira ou processando um pagamento recorrente, a camada de Serviço lida com o "como".
-3. **Repositories & Prisma**: Usam o Prisma para interagir profundamente com o banco de dados PostgreSQL, garantindo integridade dos dados sem riscos de injeção de SQL.
+3. **Repositories & Prisma**: Implementei o **Padrão Repository** com design orientado a interfaces (Interface-First). Desacoplei a lógica de negócio do ORM, facilitando testes e manutenibilidade. A implementação concreta usa Prisma para garantir integridade e segurança.
 
 Também empreguei **Middlewares** para lidar com preocupações transversais como segurança. Antes de uma requisição chegar a um controller, ela passa pelos portões de autenticação e verificações de validação (impulsionadas pelo **Zod**) que configurei, para que dados inválidos nunca toquem a lógica principal.
 

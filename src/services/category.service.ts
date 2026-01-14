@@ -1,58 +1,53 @@
-import { prisma } from '../utils/prisma';
-import { CreateCategoryDTO, UpdateCategoryDTO } from '../schemas/category.schema';
-import { AppError } from '../utils/AppError';
-import { Category } from '@prisma/client';
+import {
+  CreateCategoryDTO,
+  UpdateCategoryDTO,
+} from "../schemas/category.schema";
+import { AppError } from "../utils/AppError";
+import { ICategoryRepository } from "../repositories/interfaces/ICategoryRepository";
 
 export class CategoryService {
-    async create(userId: string, data: CreateCategoryDTO): Promise<Category> {
-        const category = await prisma.category.create({
-            data: {
-                ...data,
-                userId,
-            },
-        });
-        return category;
+  constructor(private categoryRepository: ICategoryRepository) {}
+
+  async create(userId: string, data: CreateCategoryDTO) {
+    const category = await this.categoryRepository.create({
+      ...data,
+      userId,
+    });
+    return category;
+  }
+
+  async listByUser(userId: string) {
+    return this.categoryRepository.findAllByUserId(userId);
+  }
+
+  async getById(userId: string, categoryId: string) {
+    const category = await this.categoryRepository.findById(categoryId);
+
+    if (!category) {
+      throw new AppError("Categoria nao encontrada", 404);
     }
 
-    async listByUser(userId: string): Promise<Category[]> {
-        return prisma.category.findMany({
-            where: { userId },
-            orderBy: { name: 'asc' },
-        });
+    if (category.userId !== userId) {
+      throw new AppError("Acesso nao autorizado a esta categoria", 403);
     }
 
-    async getById(userId: string, categoryId: string): Promise<Category> {
-        const category = await prisma.category.findUnique({
-            where: { id: categoryId },
-        });
+    return category;
+  }
 
-        if (!category) {
-            throw new AppError('Categoria nao encontrada', 404);
-        }
+  async update(userId: string, categoryId: string, data: UpdateCategoryDTO) {
+    await this.getById(userId, categoryId); // validations included
 
-        if (category.userId !== userId) {
-            throw new AppError('Acesso nao autorizado a esta categoria', 403);
-        }
+    return this.categoryRepository.update(categoryId, data);
+  }
 
-        return category;
-    }
+  async delete(userId: string, categoryId: string) {
+    await this.getById(userId, categoryId); // validations included
 
-    async update(userId: string, categoryId: string, data: UpdateCategoryDTO): Promise<Category> {
-        await this.getById(userId, categoryId); // validations included
-
-        return prisma.category.update({
-            where: { id: categoryId },
-            data,
-        });
-    }
-
-    async delete(userId: string, categoryId: string): Promise<void> {
-        await this.getById(userId, categoryId); // validations included
-
-        await prisma.category.delete({
-            where: { id: categoryId },
-        });
-    }
+    await this.categoryRepository.delete(categoryId);
+  }
 }
 
-export const categoryService = new CategoryService();
+import { PrismaCategoryRepository } from "../repositories/prisma/PrismaCategoryRepository";
+
+const categoryRepository = new PrismaCategoryRepository();
+export const categoryService = new CategoryService(categoryRepository);

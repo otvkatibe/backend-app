@@ -1,69 +1,53 @@
-import { prisma } from '../utils/prisma';
-import { CreateWalletDTO, UpdateWalletDTO } from '../schemas/wallet.schema';
-import { AppError } from '../utils/AppError';
-import { Wallet } from '@prisma/client';
+import { CreateWalletDTO, UpdateWalletDTO } from "../schemas/wallet.schema";
+import { AppError } from "../utils/AppError";
+import { IWalletRepository } from "../repositories/interfaces/IWalletRepository";
 
 export class WalletService {
-    async create(userId: string, data: CreateWalletDTO): Promise<Wallet> {
-        const wallet = await prisma.wallet.create({
-            data: {
-                ...data,
-                userId,
-            },
-        });
-        return wallet;
+  constructor(private walletRepository: IWalletRepository) {}
+
+  async create(userId: string, data: CreateWalletDTO) {
+    const wallet = await this.walletRepository.create({
+      ...data,
+      userId,
+    });
+    return wallet;
+  }
+
+  async listByUser(userId: string) {
+    return this.walletRepository.findAllByUserId(userId);
+  }
+
+  async getById(userId: string, walletId: string) {
+    const wallet = await this.walletRepository.findByIdWithRecentTransactions(
+      walletId,
+      5,
+    );
+
+    if (!wallet) {
+      throw new AppError("Carteira nao encontrada", 404);
     }
 
-    async listByUser(userId: string): Promise<Wallet[]> {
-        return prisma.wallet.findMany({
-            where: { userId },
-            orderBy: { createdAt: 'asc' },
-            include: {
-                _count: {
-                    select: { transactions: true }
-                }
-            }
-        });
+    if (wallet.userId !== userId) {
+      throw new AppError("Acesso nao autorizado a esta carteira", 403);
     }
 
-    async getById(userId: string, walletId: string): Promise<Wallet> {
-        const wallet = await prisma.wallet.findUnique({
-            where: { id: walletId },
-            include: {
-                transactions: {
-                    take: 5,
-                    orderBy: { date: 'desc' }
-                }
-            }
-        });
+    return wallet;
+  }
 
-        if (!wallet) {
-            throw new AppError('Carteira nao encontrada', 404);
-        }
+  async update(userId: string, walletId: string, data: UpdateWalletDTO) {
+    await this.getById(userId, walletId); // validations included
 
-        if (wallet.userId !== userId) {
-            throw new AppError('Acesso nao autorizado a esta carteira', 403);
-        }
+    return this.walletRepository.update(walletId, data);
+  }
 
-        return wallet;
-    }
+  async delete(userId: string, walletId: string) {
+    await this.getById(userId, walletId); // validations included
 
-    async update(userId: string, walletId: string, data: UpdateWalletDTO): Promise<Wallet> {
-        const wallet = await this.getById(userId, walletId); // validations included
-
-        return prisma.wallet.update({
-            where: { id: walletId },
-            data,
-        });
-    }
-
-    async delete(userId: string, walletId: string): Promise<void> {
-        await this.getById(userId, walletId); // validations included
-
-        await prisma.wallet.delete({
-            where: { id: walletId },
-        });
-    }
+    await this.walletRepository.delete(walletId);
+  }
 }
 
-export const walletService = new WalletService();
+import { PrismaWalletRepository } from "../repositories/prisma/PrismaWalletRepository";
+
+const walletRepository = new PrismaWalletRepository();
+export const walletService = new WalletService(walletRepository);
