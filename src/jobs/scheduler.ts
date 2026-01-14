@@ -2,10 +2,13 @@ import cron from 'node-cron';
 import { RecurringTransactionService } from '../services/recurring.service';
 import { logger } from '../utils/logger';
 
+import { PrismaTokenRepository } from '../repositories/prisma/PrismaTokenRepository';
+
 const recurringService = new RecurringTransactionService();
+const tokenRepository = new PrismaTokenRepository();
 
 export const startScheduler = () => {
-    // Run every hour
+    // Run every hour - Recurring Transactions
     cron.schedule('0 * * * *', async () => {
         logger.info('[Scheduler] Checking for recurring transactions...');
         try {
@@ -23,5 +26,18 @@ export const startScheduler = () => {
         }
     });
 
-    logger.info('[Scheduler] Job started: Recurring Transactions (Every Hour)');
+    // Run every day at midnight - Token Cleanup
+    cron.schedule('0 0 * * *', async () => {
+        logger.info('[Scheduler] Cleaning up expired refresh tokens...');
+        try {
+            const count = await tokenRepository.deleteExpired();
+            if (count > 0) {
+                logger.info(`[Scheduler] Deleted ${count} expired/revoked tokens.`);
+            }
+        } catch (error) {
+            logger.error('[Scheduler] Error cleaning up tokens', error);
+        }
+    });
+
+    logger.info('[Scheduler] Jobs started: Recurring Transactions (Hourly), Token Cleanup (Daily)');
 };
