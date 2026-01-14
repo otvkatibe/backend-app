@@ -10,11 +10,10 @@ class CacheService {
             host: process.env.REDIS_HOST || 'localhost',
             port: Number(process.env.REDIS_PORT) || 6379,
             password: process.env.REDIS_PASSWORD || undefined,
-            maxRetriesPerRequest: 1, // Fail fast for commands
-            enableOfflineQueue: false, // Do not queue commands if disconnected
+            maxRetriesPerRequest: 1,
+            enableOfflineQueue: false,
             lazyConnect: true,
             retryStrategy: (times) => {
-                // Exponential backoff with max delay of 2 seconds
                 const delay = Math.min(times * 50, 2000);
                 return delay;
             },
@@ -78,6 +77,32 @@ class CacheService {
         } catch (error) {
             logger.error(`Cache DEL error for key ${key}:`, error);
         }
+    }
+
+    /**
+     * Acquire a distributed lock
+     * @param key Lock key
+     * @param ttl Time to live in milliseconds
+     * @returns true if lock acquired, false otherwise
+     */
+    async acquireLock(key: string, ttl: number): Promise<boolean> {
+        try {
+            if (this.redis.status !== 'ready') return false;
+            // SET key value PX ttl NX (Only set if not exists, with expiry in ms)
+            const result = await this.redis.set(key, 'locked', 'PX', ttl, 'NX');
+            return result === 'OK';
+        } catch (error) {
+            logger.error(`Lock acquire error for key ${key}:`, error);
+            return false;
+        }
+    }
+
+    /**
+     * Release a distributed lock
+     * @param key Lock key
+     */
+    async releaseLock(key: string): Promise<void> {
+        await this.del(key);
     }
 
     /**
