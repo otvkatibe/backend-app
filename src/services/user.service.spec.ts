@@ -162,5 +162,38 @@ describe('UserService Unit Tests', () => {
 
             await expect(userService.refreshToken(tokenString)).rejects.toThrow('Refresh token revogado');
         });
+        it('should throw error if jwt verification fails', async () => {
+            jest.spyOn(jwt, 'verify').mockImplementation(() => {
+                throw new Error('Invalid token');
+            });
+            await expect(userService.refreshToken('invalid-jwt')).rejects.toThrow('Refresh token invalido ou expirado');
+        });
+    });
+
+    describe('getProfile', () => {
+        it('should return user profile if found', async () => {
+            const user = await userRepository.create({ name: 'Profile User', email: 'p@e.com', password: '123' });
+            const profile = await userService.getProfile(user.id);
+
+            expect(profile).toBeDefined();
+            expect(profile.id).toBe(user.id);
+            expect(profile).not.toHaveProperty('password');
+        });
+
+        it('should throw error if user not found', async () => {
+            await expect(userService.getProfile('non-existent-id')).rejects.toThrow('Usuario nao encontrado');
+        });
+    });
+
+    describe('listAll', () => {
+        it('should return paginated list of users', async () => {
+            await userRepository.create({ name: 'User 1', email: '1@e.com', password: '123' });
+            await userRepository.create({ name: 'User 2', email: '2@e.com', password: '123' });
+
+            const result = await userService.listAll({ page: 1, limit: 10 });
+
+            expect(result.data).toHaveLength(2);
+            expect(result.meta.total).toBe(2);
+        });
     });
 });

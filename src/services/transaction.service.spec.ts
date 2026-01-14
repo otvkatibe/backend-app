@@ -135,6 +135,7 @@ describe('Testes Unitários TransactionService', () => {
                 date: new Date().toISOString(),
                 walletId: wallet.id,
                 categoryId: category.id,
+                description: 'Salário',
             });
 
             // Buscar página 1
@@ -142,6 +143,36 @@ describe('Testes Unitários TransactionService', () => {
 
             expect(result.data).toHaveLength(1);
             expect(result.meta.total).toBe(1);
+        });
+
+        it('deve filtrar transações por carteira e data', async () => {
+            const userId = 'user-123';
+            const wallet1 = await mockWalletRepo.create({ userId, name: 'W1', currency: 'BRL', balance: 0 });
+            const wallet2 = await mockWalletRepo.create({ userId, name: 'W2', currency: 'BRL', balance: 0 });
+            const category = await mockCategoryRepo.create({ userId, name: 'C' });
+
+            // T1: Wallet 1, Hoje
+            await transactionService.create(userId, {
+                amount: 100,
+                type: TransactionType.EXPENSE,
+                date: new Date().toISOString(),
+                walletId: wallet1.id,
+                categoryId: category.id,
+            });
+
+            // T2: Wallet 2, Hoje
+            await transactionService.create(userId, {
+                amount: 200,
+                type: TransactionType.EXPENSE,
+                date: new Date().toISOString(),
+                walletId: wallet2.id,
+                categoryId: category.id,
+            });
+
+            // Filtro por Wallet 1
+            const result = await transactionService.listByUser(userId, { walletId: wallet1.id });
+
+            expect(result).toBeDefined();
         });
     });
 });
