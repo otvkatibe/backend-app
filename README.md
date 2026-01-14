@@ -30,7 +30,7 @@ Meu foco foi criar uma API RESTful segura, escalável e de fácil manutenção, 
 Gerenciar dinheiro não deveria ser uma tarefa árdua. Desenvolvi este projeto para simplificar o rastreamento financeiro, oferecendo um conjunto completo de funcionalidades:
 
 - **Rastreamento Inteligente de Transações**: Registre cada receita e despesa com detalhes. Implementei suporte a múltiplas **carteiras** (como Dinheiro, Conta Bancária ou Poupança) para que você possa separar os fundos, mas ainda visualizar seu patrimônio líquido total na sua moeda preferida (padrão BRL).
-- **Transações Recorrentes Automatizadas**: Pare de lançar manualmente sua assinatura da Netflix ou o aluguel todo mês. Com o agendador baseado em CRON que configurei, você define as transações uma vez — mensalmente, semanalmente ou em horários personalizados — e o sistema cuida do resto automaticamente.
+- **Transações Recorrentes Automatizadas**: Pare de lançar manualmente sua assinatura da Netflix ou o aluguel todo mês. Com o agendador baseado em CRON que configurei, você define as transações uma vez e o sistema cuida do resto automaticamente.
 - **Orçamentos e Metas**: Mantenha seus gastos sob controle definindo **Orçamentos** mensais para categorias específicas. Planejando as férias dos sonhos? Cries **Metas** com prazos e acompanhe seu progresso enquanto economiza.
 - **Segurança e Privacidade**: Protegi seus dados com criptografia de senha padrão da indústria (BCrypt) e autenticação JWT (JSON Web Token), garantindo que apenas você tenha acesso aos seus detalhes financeiros.
 

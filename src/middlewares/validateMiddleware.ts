@@ -8,9 +8,8 @@ export const validate = (schema: ZodSchema) => async (req: Request, res: Respons
             body: req.body,
             query: req.query,
             params: req.params,
-        })) as any;
+        })) as { body?: Record<string, unknown>; query?: Record<string, unknown>; params?: Record<string, unknown> };
 
-        req.body = parsed.body;
         req.body = parsed.body;
         // req.query e req.params podem ser read-only em algumas versoes do Express/types
         // A sanitizacao do body e a mais importante para evitar erros do Prisma
@@ -19,8 +18,7 @@ export const validate = (schema: ZodSchema) => async (req: Request, res: Respons
         return next();
     } catch (error) {
         if (error instanceof ZodError) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const errorMessage = (error as any).errors.map((e: any) => e.message).join(', ');
+            const errorMessage = error.issues.map((e) => e.message).join(', ');
             return next(new AppError(`Falha na validacao: ${errorMessage}`, 400));
         }
         return next(error);

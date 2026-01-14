@@ -22,4 +22,13 @@ export class PrismaTokenRepository implements ITokenRepository {
             data: { revoked: true },
         });
     }
+
+    async deleteExpired(): Promise<number> {
+        const { count } = await prisma.refreshToken.deleteMany({
+            where: {
+                OR: [{ expiresAt: { lt: new Date() } }, { revoked: true }],
+            },
+        });
+        return count;
+    }
 }

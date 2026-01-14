@@ -1,9 +1,9 @@
-import { Budget, Prisma } from '@prisma/client';
+import { Budget, Category, Prisma } from '@prisma/client';
 import { IBudgetRepository } from '../interfaces/IBudgetRepository';
 import { prisma } from '../../utils/prisma';
 
 export class PrismaBudgetRepository implements IBudgetRepository {
-    async findMany(options: Prisma.BudgetFindManyArgs): Promise<(Budget & { category?: any })[]> {
+    async findMany(options: Prisma.BudgetFindManyArgs): Promise<(Budget & { category?: Category })[]> {
         return prisma.budget.findMany(options);
     }
 
