@@ -1,10 +1,11 @@
+import { env } from './config/env';
 import app from './app';
 
 import { logger } from './utils/logger';
 import { startScheduler } from './jobs/scheduler';
 import { gracefulShutdown } from './utils/shutdown';
 
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT;
 
 startScheduler();
 
