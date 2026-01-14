@@ -1,4 +1,4 @@
-import express, { type Request, type Response } from 'express';
+import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
@@ -16,7 +16,6 @@ import { errorHandler } from './middlewares/errorHandler';
 import { globalLimiter } from './middlewares/rateLimiter';
 import { requestId } from './middlewares/requestId';
 import { requestLogger } from './middlewares/requestLogger';
-import { logger } from './utils/logger';
 
 const app = express();
 
@@ -25,18 +24,20 @@ app.use(helmet());
 
 // CORS Configuration
 const allowedOrigins = process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:5173'];
-app.use(cors({
-    origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true
-}));
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            // Allow requests with no origin (like mobile apps or curl requests)
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.indexOf(origin) !== -1) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
+        credentials: true,
+    }),
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

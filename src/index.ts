@@ -1,5 +1,5 @@
 import app from './app';
-import { prisma } from './utils/prisma';
+
 import { logger } from './utils/logger';
 import { startScheduler } from './jobs/scheduler';
 import { gracefulShutdown } from './utils/shutdown';

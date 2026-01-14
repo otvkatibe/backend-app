@@ -31,8 +31,8 @@ export class BudgetService {
                     userId,
                     categoryId,
                     month,
-                    year
-                }
+                    year,
+                },
             },
             update: { amount },
             create: {
@@ -40,8 +40,8 @@ export class BudgetService {
                 categoryId,
                 amount,
                 month,
-                year
-            }
+                year,
+            },
         });
 
         return budget;
@@ -55,7 +55,7 @@ export class BudgetService {
         const where = {
             userId,
             ...(filters.month && { month: filters.month }),
-            ...(filters.year && { year: filters.year })
+            ...(filters.year && { year: filters.year }),
         };
 
         const [budgets, total] = await prisma.$transaction([
@@ -64,9 +64,9 @@ export class BudgetService {
                 skip,
                 take: limit,
                 include: { category: { select: { name: true } } },
-                orderBy: [{ year: 'desc' }, { month: 'desc' }]
+                orderBy: [{ year: 'desc' }, { month: 'desc' }],
             }),
-            prisma.budget.count({ where })
+            prisma.budget.count({ where }),
         ]);
 
         return {
@@ -75,8 +75,8 @@ export class BudgetService {
                 total,
                 page,
                 limit,
-                totalPages: Math.ceil(total / limit)
-            }
+                totalPages: Math.ceil(total / limit),
+            },
         };
     }
 }

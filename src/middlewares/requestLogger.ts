@@ -12,7 +12,7 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction) =
             status: res.statusCode,
             duration: `${duration}ms`,
             requestId: req.id,
-            ip: req.ip
+            ip: req.ip,
         };
 
         if (res.statusCode >= 400) {

@@ -16,7 +16,7 @@
  *         role:
  *           type: string
  *           enum: [USER, ADMIN]
- *     
+ *
  *     CreateUserRequest:
  *       type: object
  *       required:

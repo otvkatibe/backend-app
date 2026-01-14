@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { Prisma } from '@prisma/client';
+
 import { ZodError } from 'zod';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { AppError } from '../utils/AppError';
@@ -10,45 +10,40 @@ import {
     handleAppError,
     handleGenericError,
     handleSyntaxError,
-    isPrismaError
+    isPrismaError,
 } from './errorMappers';
 import { logger } from '../utils/logger';
 
-export const errorHandler = (
-    err: Error,
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+export const errorHandler = (err: Error, req: Request, res: Response, _next: NextFunction) => {
     // Log exception (Traceability)
-    logger.error('Unhandled Exception escaped to ErrorHandler', {
+    logger.error('Exceção não tratada capturada pelo ErrorHandler', {
         error: err.message,
         stack: err.stack,
-        requestId: (req as any).id // Assuming req.id might not be directly on Request type
+        requestId: (req as Request & { id?: string }).id,
     });
-    // 1. Business Logic Errors (Explicitly thrown by us)
+    // 1. Erros de Regra de Negócio (Lançados explicitamente por nós)
     if (err instanceof AppError) {
         return handleAppError(err, res);
     }
 
-    // 2. Input Validation Errors (Zod)
+    // 2. Erros de Validação de Input (Zod)
     if (err instanceof ZodError) {
         return handleZodError(err, res);
     }
 
-    // 3. Database Errors (Prisma)
+    // 3. Erros de Banco de Dados (Prisma)
     if (isPrismaError(err)) {
         return handlePrismaError(err, res);
     }
 
-    // 4. Authentication Errors (JWT)
+    // 4. Erros de Autenticação (JWT)
     if (err instanceof JsonWebTokenError || err instanceof TokenExpiredError) {
         return handleJWTError(err, res);
     }
 
-    // 5. Malformed JSON (Express/BodyParser)
-    // Note: 'status' property exists on some Express/BodyParser syntax errors
-    if (err instanceof SyntaxError && 'status' in err && (err as any).status === 400 && 'body' in err) {
+    // 5. JSON Malformado (Express/BodyParser)
+    // Nota: propriedade 'status' existe em alguns erros de sintaxe do Express/BodyParser
+    if (err instanceof SyntaxError && 'status' in err && (err as { status?: number }).status === 400 && 'body' in err) {
         return handleSyntaxError(err, res);
     }
 

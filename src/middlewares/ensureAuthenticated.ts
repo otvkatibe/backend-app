@@ -2,11 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { verify } from '../utils/jwt';
 import { AppError } from '../utils/AppError';
 
-export const ensureAuthenticated = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+export const ensureAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
@@ -20,11 +16,11 @@ export const ensureAuthenticated = (
 
         req.user = {
             id,
-            role
+            role,
         };
 
         return next();
-    } catch (err) {
+    } catch (_err) {
         throw new AppError('Token invalido', 401);
     }
 };

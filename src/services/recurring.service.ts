@@ -15,7 +15,7 @@ export class RecurringTransactionService {
     async create(userId: string, data: CreateRecurringDTO) {
         // Validate wallet ownership
         const wallet = await prisma.wallet.findUnique({
-            where: { id: data.walletId, userId }
+            where: { id: data.walletId, userId },
         });
         if (!wallet) throw new Error('Wallet not found or access denied');
 
@@ -32,10 +32,10 @@ export class RecurringTransactionService {
                     interval: data.interval,
                     nextRun,
                     walletId: data.walletId,
-                    categoryId: data.categoryId
-                }
+                    categoryId: data.categoryId,
+                },
             });
-        } catch (err: any) {
+        } catch (_err: any) {
             throw new Error('Invalid cron expression');
         }
     }
@@ -45,8 +45,8 @@ export class RecurringTransactionService {
         const dueTransactions = await prisma.recurringTransaction.findMany({
             where: {
                 isActive: true,
-                nextRun: { lte: now }
-            }
+                nextRun: { lte: now },
+            },
         });
 
         console.log(`[Recurring] Detected ${dueTransactions.length} due transactions.`);
@@ -81,7 +81,7 @@ export class RecurringTransactionService {
         return await prisma.$transaction(async (tx) => {
             // 1. Re-fetch transaction (Optimistic Locking / Idempotency Check)
             const freshRecurring = await tx.recurringTransaction.findUnique({
-                where: { id }
+                where: { id },
             });
 
             // If it disappeared or nextRun was already pushed forward by another process
@@ -97,24 +97,22 @@ export class RecurringTransactionService {
                     description: freshRecurring.description || `Recurring: ${freshRecurring.interval}`,
                     date: executionDate,
                     walletId: freshRecurring.walletId,
-                    categoryId: freshRecurring.categoryId
-                }
+                    categoryId: freshRecurring.categoryId,
+                },
             });
 
             // 3. Update Wallet Balance
-            const adjustment = freshRecurring.type === 'INCOME'
-                ? freshRecurring.amount
-                : freshRecurring.amount.mul(-1);
+            const adjustment = freshRecurring.type === 'INCOME' ? freshRecurring.amount : freshRecurring.amount.mul(-1);
 
             await tx.wallet.update({
                 where: { id: freshRecurring.walletId },
-                data: { balance: { increment: adjustment } }
+                data: { balance: { increment: adjustment } },
             });
 
             // 4. Calculate next run
             const interval = (CronParser as any).parse(freshRecurring.interval, {
                 currentDate: executionDate,
-                strict: false
+                strict: false,
             });
             const nextRun = interval.next().toDate();
 
@@ -123,8 +121,8 @@ export class RecurringTransactionService {
                 where: { id: freshRecurring.id },
                 data: {
                     lastRun: executionDate,
-                    nextRun
-                }
+                    nextRun,
+                },
             });
 
             return transaction;
@@ -134,20 +132,20 @@ export class RecurringTransactionService {
     async list(userId: string) {
         return await prisma.recurringTransaction.findMany({
             where: { wallet: { userId } },
-            include: { category: true, wallet: true }
+            include: { category: true, wallet: true },
         });
     }
 
     async cancel(userId: string, id: string) {
         const recurring = await prisma.recurringTransaction.findFirst({
-            where: { id, wallet: { userId } }
+            where: { id, wallet: { userId } },
         });
 
         if (!recurring) throw new Error('Recurring transaction not found');
 
         return await prisma.recurringTransaction.update({
             where: { id },
-            data: { isActive: false }
+            data: { isActive: false },
         });
     }
 }

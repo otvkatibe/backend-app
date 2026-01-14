@@ -1,8 +1,8 @@
-import { Router } from "express";
-import { UserController } from "../controllers/user.controller";
-import { authLimiter } from "../middlewares/rateLimiter";
-import { ensureAuthenticated } from "../middlewares/ensureAuthenticated";
-import { authorize } from "../middlewares/authorize";
+import { Router } from 'express';
+import { UserController } from '../controllers/user.controller';
+import { authLimiter } from '../middlewares/rateLimiter';
+import { ensureAuthenticated } from '../middlewares/ensureAuthenticated';
+import { authorize } from '../middlewares/authorize';
 
 const userRoute = Router();
 const userController = new UserController();
@@ -29,7 +29,7 @@ const userController = new UserController();
  *       400:
  *         description: Validation error
  */
-userRoute.post("/users", authLimiter, userController.create);
+userRoute.post('/users', authLimiter, userController.create);
 
 /**
  * @swagger
@@ -53,7 +53,7 @@ userRoute.post("/users", authLimiter, userController.create);
  *       401:
  *         description: Invalid credentials
  */
-userRoute.post("/login", authLimiter, userController.login);
+userRoute.post('/login', authLimiter, userController.login);
 
 /**
  * @swagger
@@ -73,7 +73,7 @@ userRoute.post("/login", authLimiter, userController.login);
  *       401:
  *         description: Unauthorized
  */
-userRoute.get("/profile", ensureAuthenticated, userController.getProfile);
+userRoute.get('/profile', ensureAuthenticated, userController.getProfile);
 
 /**
  * @swagger
@@ -100,21 +100,11 @@ userRoute.get("/profile", ensureAuthenticated, userController.getProfile);
  *       403:
  *         description: Forbidden
  */
-userRoute.get(
-  "/users",
-  ensureAuthenticated,
-  authorize(["ADMIN"]),
-  userController.listAll,
-);
+userRoute.get('/users', ensureAuthenticated, authorize(['ADMIN']), userController.listAll);
 
-userRoute.get(
-  "/admin/stats",
-  ensureAuthenticated,
-  authorize(["ADMIN"]),
-  (req, res) => {
-    return res.json({ status: "open" });
-  },
-);
+userRoute.get('/admin/stats', ensureAuthenticated, authorize(['ADMIN']), (req, res) => {
+    return res.json({ status: 'open' });
+});
 
 /**
  * @swagger

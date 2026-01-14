@@ -5,7 +5,7 @@ export interface PaginatedResult<T> {
         page: number;
         limit: number;
         totalPages: number;
-    }
+    };
 }
 
 export interface PaginationOptions {

@@ -13,8 +13,8 @@ export class GoalService {
         return prisma.goal.create({
             data: {
                 ...data,
-                userId
-            }
+                userId,
+            },
         });
     }
 
@@ -26,15 +26,15 @@ export class GoalService {
         return prisma.goal.update({
             where: { id: goalId },
             data: {
-                currentAmount: { increment: amount }
-            }
+                currentAmount: { increment: amount },
+            },
         });
     }
 
     async list(userId: string) {
         return prisma.goal.findMany({
             where: { userId },
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: 'desc' },
         });
     }
 }

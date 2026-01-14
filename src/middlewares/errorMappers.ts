@@ -41,7 +41,7 @@ export const handlePrismaError = (err: PrismaError, res: Response) => {
             console.error('Unhandled Prisma Error:', err);
             return res.status(500).json({
                 status: 'error',
-                message: 'Falha na operacao do banco de dados.'
+                message: 'Falha na operacao do banco de dados.',
             });
     }
 };
@@ -83,9 +83,9 @@ export const handleAppError = (err: AppError, res: Response) => {
 export const handleSyntaxError = (err: SyntaxError, res: Response) => {
     return res.status(400).json({
         status: 'error',
-        message: 'Payload JSON malformado.'
+        message: 'Payload JSON malformado.',
     });
-}
+};
 
 export const handleGenericError = (err: Error, res: Response) => {
     // Note: We don't need to log here anymore because the main errorHandler already logged it.

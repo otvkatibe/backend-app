@@ -9,6 +9,6 @@ export const calculatePagination = (options: PaginationOptions) => {
         skip,
         take: limit,
         page,
-        limit
+        limit,
     };
 };

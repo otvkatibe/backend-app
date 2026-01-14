@@ -1,53 +1,50 @@
-import {
-  CreateCategoryDTO,
-  UpdateCategoryDTO,
-} from "../schemas/category.schema";
-import { AppError } from "../utils/AppError";
-import { ICategoryRepository } from "../repositories/interfaces/ICategoryRepository";
+import { CreateCategoryDTO, UpdateCategoryDTO } from '../schemas/category.schema';
+import { AppError } from '../utils/AppError';
+import { ICategoryRepository } from '../repositories/interfaces/ICategoryRepository';
 
 export class CategoryService {
-  constructor(private categoryRepository: ICategoryRepository) {}
+    constructor(private categoryRepository: ICategoryRepository) {}
 
-  async create(userId: string, data: CreateCategoryDTO) {
-    const category = await this.categoryRepository.create({
-      ...data,
-      userId,
-    });
-    return category;
-  }
-
-  async listByUser(userId: string) {
-    return this.categoryRepository.findAllByUserId(userId);
-  }
-
-  async getById(userId: string, categoryId: string) {
-    const category = await this.categoryRepository.findById(categoryId);
-
-    if (!category) {
-      throw new AppError("Categoria nao encontrada", 404);
+    async create(userId: string, data: CreateCategoryDTO) {
+        const category = await this.categoryRepository.create({
+            ...data,
+            userId,
+        });
+        return category;
     }
 
-    if (category.userId !== userId) {
-      throw new AppError("Acesso nao autorizado a esta categoria", 403);
+    async listByUser(userId: string) {
+        return this.categoryRepository.findAllByUserId(userId);
     }
 
-    return category;
-  }
+    async getById(userId: string, categoryId: string) {
+        const category = await this.categoryRepository.findById(categoryId);
 
-  async update(userId: string, categoryId: string, data: UpdateCategoryDTO) {
-    await this.getById(userId, categoryId); // validations included
+        if (!category) {
+            throw new AppError('Categoria nao encontrada', 404);
+        }
 
-    return this.categoryRepository.update(categoryId, data);
-  }
+        if (category.userId !== userId) {
+            throw new AppError('Acesso nao autorizado a esta categoria', 403);
+        }
 
-  async delete(userId: string, categoryId: string) {
-    await this.getById(userId, categoryId); // validations included
+        return category;
+    }
 
-    await this.categoryRepository.delete(categoryId);
-  }
+    async update(userId: string, categoryId: string, data: UpdateCategoryDTO) {
+        await this.getById(userId, categoryId); // validations included
+
+        return this.categoryRepository.update(categoryId, data);
+    }
+
+    async delete(userId: string, categoryId: string) {
+        await this.getById(userId, categoryId); // validations included
+
+        await this.categoryRepository.delete(categoryId);
+    }
 }
 
-import { PrismaCategoryRepository } from "../repositories/prisma/PrismaCategoryRepository";
+import { PrismaCategoryRepository } from '../repositories/prisma/PrismaCategoryRepository';
 
 const categoryRepository = new PrismaCategoryRepository();
 export const categoryService = new CategoryService(categoryRepository);

@@ -10,11 +10,13 @@ export const startScheduler = () => {
         logger.info('[Scheduler] Checking for recurring transactions...');
         try {
             const results = await recurringService.processDueTransactions();
-            const successCount = results.filter(r => r.status === 'success').length;
-            const failCount = results.filter(r => r.status === 'failed').length;
+            const successCount = results.filter((r) => r.status === 'success').length;
+            const failCount = results.filter((r) => r.status === 'failed').length;
 
             if (results.length > 0) {
-                logger.info(`[Scheduler] Processed ${results.length} transactions. Success: ${successCount}, Failed: ${failCount}`);
+                logger.info(
+                    `[Scheduler] Processed ${results.length} transactions. Success: ${successCount}, Failed: ${failCount}`,
+                );
             }
         } catch (error) {
             logger.error('[Scheduler] Error processing recurring transactions', error);

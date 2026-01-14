@@ -1,4 +1,3 @@
-
 import { Router } from 'express';
 import { walletController } from '../controllers/wallet.controller';
 import { ensureAuthenticated } from '../middlewares/ensureAuthenticated';
