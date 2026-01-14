@@ -58,7 +58,7 @@ class CacheService {
      * @param value Data to store
      * @param ttl Time to live in seconds (default 60)
      */
-    async set(key: string, value: any, ttl: number = 60): Promise<void> {
+    async set<T>(key: string, value: T, ttl: number = 60): Promise<void> {
         try {
             if (this.redis.status !== 'ready') return;
             await this.redis.set(key, JSON.stringify(value), 'EX', ttl);

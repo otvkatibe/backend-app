@@ -3,19 +3,19 @@ import { ZodError } from 'zod';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { AppError } from '../utils/AppError';
 
-// Duck-typing interface for Prisma Errors since types are flaky in this env
 interface PrismaError extends Error {
     code: string;
     meta?: Record<string, unknown>;
     clientVersion?: string;
 }
 
-export const isPrismaError = (err: any): err is PrismaError => {
+export const isPrismaError = (err: unknown): err is PrismaError => {
+    const e = err as Record<string, unknown>;
     return (
-        err &&
+        err !== null &&
         typeof err === 'object' &&
-        typeof err.code === 'string' &&
-        (err.clientVersion || err.name?.includes('Prisma')) // Robust check
+        typeof e.code === 'string' &&
+        (typeof e.clientVersion === 'string' || (typeof e.name === 'string' && e.name.includes('Prisma')))
     );
 };
 

@@ -9,7 +9,7 @@ export class PrismaTransactionRepository implements ITransactionRepository {
                 data,
             });
 
-            const amountDecimal = new Prisma.Decimal(data.amount as any); // Type assertion needed typically or ensure data.amount is Decimal
+            const amountDecimal = new Prisma.Decimal(data.amount as number | string | Prisma.Decimal);
             const balanceChange = data.type === 'INCOME' ? amountDecimal : amountDecimal.mul(-1);
 
             await tx.wallet.update({

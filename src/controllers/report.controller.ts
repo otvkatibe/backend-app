@@ -61,8 +61,7 @@ export const exportReport = async (req: Request, res: Response, next: NextFuncti
             });
 
         const userId = req.user!.id;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let data: any[] = [];
+        let data: Record<string, unknown>[] = [];
         let fields: string[] = [];
 
         if (type === 'monthly-expenses') {
