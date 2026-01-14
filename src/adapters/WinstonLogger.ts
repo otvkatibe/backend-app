@@ -28,19 +28,12 @@ export class WinstonLogger implements Logger {
 
         this.logger = winston.createLogger({
             level: logLevel,
-            format: winston.format.combine(
-                maskSensitiveData(),
-                winston.format.timestamp(),
-                winston.format.json()
-            ),
+            format: winston.format.combine(maskSensitiveData(), winston.format.timestamp(), winston.format.json()),
             transports: [
                 new winston.transports.Console({
                     format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
-                    silent: isProduction, // Optional: Keep console logs in prod? Usually yes for container logs. Let's keep it but maybe JSON format in prod.
+                    silent: isProduction,
                 }),
-                // Keep console enabled for container logging especially in Docker
-                // But maybe ensure JSON format in production for console too?
-                // For now, let's stick to the request: "Níveis de log por ambiente" and masking.
                 new DailyRotateFile({
                     filename: 'logs/error-%DATE%.log',
                     datePattern: 'YYYY-MM-DD',
@@ -58,14 +51,10 @@ export class WinstonLogger implements Logger {
                 }),
             ],
         });
-        
-        // Override console format for production to be JSON (better for Datadog/CloudWatch)
+
         if (isProduction) {
-            this.logger.transports.find(t => t instanceof winston.transports.Console)!.format = winston.format.combine(
-                maskSensitiveData(),
-                winston.format.timestamp(),
-                winston.format.json()
-            );
+            this.logger.transports.find((t) => t instanceof winston.transports.Console)!.format =
+                winston.format.combine(maskSensitiveData(), winston.format.timestamp(), winston.format.json());
         }
     }
 
