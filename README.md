@@ -88,7 +88,7 @@ Você precisará do **Node.js** (v18+) e **Docker** instalados na sua máquina. 
 
     ```bash
     git clone <url-do-repositorio>
-    cd backend-app
+    cd finances-backend-api
     ```
 
 2. **Instale as dependências**:
